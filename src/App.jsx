@@ -140,7 +140,105 @@ function OB_Subs({al,go}){const[sel,setSel]=useState({});const togSub=(allergen,
 function OB_Cuisines({cu,scu,go}){const tog=c=>scu(p=>p.includes(c)?p.filter(x=>x!==c):[...p,c]);return(<Screen><Dots n={12} cur={7}/><Hdr icon={Icon.bookmark} title="What cuisines do you love?" sub="Pick as many as you want."/><OBScroll><div style={{paddingTop:8}}><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{CU.map(c=><Pill key={c} label={c} on={cu.includes(c)} toggle={()=>tog(c)}/>)}</div></div></OBScroll><OBBtn><Btn onClick={go} disabled={cu.length===0} label={cu.length>0?`${cu.length} selected →`:"Pick at least one →"}/></OBBtn></Screen>);}
 function OB_Faves({meals,setMeals,go}){const tog=(cat,item)=>setMeals(m=>({...m,[cat]:m[cat].includes(item)?m[cat].filter(x=>x!==item):[...m[cat],item]}));return(<Screen><Dots n={12} cur={8}/><Hdr icon={Icon.chef} title="What do you usually eat?" sub="Tap anything you've made or genuinely enjoyed."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:20,paddingTop:8}}>{[{key:"breakfast",l:"Breakfasts",data:BF},{key:"lunch",l:"Lunches",data:LN},{key:"dinner",l:"Dinners",data:DN}].map(s=>(<div key={s.key}><p style={{fontSize:11,fontWeight:700,color:C.mu,marginBottom:10,textTransform:"uppercase",letterSpacing:"0.7px"}}>{s.l}</p><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{s.data.map(item=><Pill key={item} label={item} on={meals[s.key].includes(item)} toggle={()=>tog(s.key,item)}/>)}</div></div>))}</div></OBScroll><OBBtn><Btn onClick={go} label="These are mine →"/></OBBtn></Screen>);}
 function OB_Confess({dis,sdis,go}){const[quip,setQuip]=useState("");const[custom,setCustom]=useState("");const tog=item=>{if(!dis.includes(item))setQuip(QUIPS[item]||"Noted. Gone.");sdis(p=>p.includes(item)?p.filter(x=>x!==item):[...p,item]);};const addCustom=()=>{if(custom.trim()&&!dis.includes(custom.trim())){sdis(p=>[...p,custom.trim()]);setQuip(`${custom.trim()} — banished. No questions asked.`);setCustom("");}};return(<Screen><Dots n={12} cur={9}/><div style={{padding:"14px 24px 8px",flexShrink:0}}><div style={{color:C.r2,marginBottom:10}}>{Icon.x}</div><h2 style={{fontFamily:"'Fraunces',serif",fontSize:25,color:C.dk,marginBottom:5,fontWeight:700}}>The Confession Booth.</h2><p style={{color:C.mu,fontSize:13,lineHeight:1.6}}>Tell us what has personally wronged you. We will not judge. (Much.)</p></div>{quip&&(<div style={{margin:"0 24px 8px",padding:"11px 14px",borderRadius:10,background:C.g6,border:`1px solid ${C.g5}`,flexShrink:0}}><p style={{fontSize:13,color:C.g1,fontWeight:700,fontStyle:"italic"}}>{quip}</p></div>)}<OBScroll><div style={{display:"flex",flexDirection:"column",gap:14,paddingTop:4}}><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{HL.map(item=>(<button key={item} onClick={()=>tog(item)} style={{padding:"8px 14px",borderRadius:20,border:`1.5px solid ${dis.includes(item)?C.r2:C.brd}`,background:dis.includes(item)?C.r5:C.wh,color:dis.includes(item)?C.r1:C.mu,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all 0.15s",textDecoration:dis.includes(item)?"line-through":"none"}}>{item}</button>))}</div><div style={{display:"flex",gap:8}}><input value={custom} onChange={e=>setCustom(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addCustom()} placeholder="Add your own nemesis ingredient..." style={{...inp,flex:1}}/><button onClick={addCustom} style={{padding:"10px 14px",borderRadius:10,border:"none",background:C.g2,color:C.wh,cursor:"pointer",display:"flex",alignItems:"center"}}>{Icon.plus}</button></div>{dis.length>0&&(<p style={{fontSize:12,color:C.mu}}>Blacklisted: {dis.slice(0,5).join(", ")}{dis.length>5?` + ${dis.length-5} more`:""}</p>)}</div></OBScroll><OBBtn><Btn onClick={go} label={dis.length===0?"I eat everything → (respect)":`Banish these ${dis.length} →`}/></OBBtn></Screen>);}
-function OB_Inventory({inv,sinv,go}){const[phase,setPhase]=useState("idle");const scan=()=>{setPhase("scanning");setTimeout(()=>{sinv(INV_SEED);setPhase("done");},2200);};return(<Screen><Dots n={12} cur={10}/><Hdr icon={Icon.scan} title="What's in your kitchen?" sub="Scan your fridge, pantry, and cupboards. Every recipe is built around what you already have."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:12,paddingTop:8}}>{phase==="idle"&&(<><div onClick={scan} style={{border:`1.5px dashed ${C.brd}`,borderRadius:14,padding:"28px 20px",display:"flex",flexDirection:"column",alignItems:"center",gap:10,background:C.wh,cursor:"pointer"}}><div style={{color:C.g3}}>{Icon.scan}</div><p style={{fontSize:14,fontWeight:700,color:C.dk}}>Scan your kitchen</p><p style={{fontSize:12,color:C.mu,textAlign:"center",lineHeight:1.6}}>Photos of your fridge, pantry, and countertop.<br/>AI identifies items, quantities, and freshness.</p><span style={{padding:"9px 20px",borderRadius:20,background:C.g2,color:C.wh,fontSize:13,fontWeight:700}}>Open camera</span></div><div style={{textAlign:"center",fontSize:12,color:C.mu}}>— or —</div><button onClick={scan} style={{padding:"13px",borderRadius:12,border:`1.5px solid ${C.brd}`,background:C.wh,color:C.md,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>Add items manually</button></>)}{phase==="scanning"&&(<div style={{padding:"32px 24px",borderRadius:14,background:C.g6,border:`1.5px solid ${C.g5}`,textAlign:"center"}}><div style={{color:C.g3,marginBottom:12,display:"inline-block",animation:"spin 1.2s linear infinite"}}>{Icon.refresh}</div><p style={{fontSize:14,fontWeight:700,color:C.g1}}>Scanning kitchen...</p></div>)}{phase==="done"&&(<><div style={{padding:"12px 14px",borderRadius:10,background:C.g6,border:`1px solid ${C.g5}`}}><p style={{fontSize:13,color:C.g1,fontWeight:700}}>{inv.length} items detected.</p></div><div style={{display:"flex",flexDirection:"column",gap:7}}>{inv.map(item=>{const col=item.d<=3?C.r2:item.d<=7?C.o2:C.g2;return(<div key={item.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 12px",borderRadius:10,background:C.wh,borderLeft:`3px solid ${col}`}}><div><p style={{fontSize:13,fontWeight:700,color:C.dk}}>{item.name}</p><p style={{fontSize:11,color:C.mu}}>{item.cat} · {item.qty}</p></div><span style={{fontSize:11,color:col,fontWeight:700}}>{item.d<=3?"Use now":item.d<=7?`${item.d}d left`:item.qty}</span></div>);})}</div></>)}</div></OBScroll><OBBtn><Btn onClick={go} disabled={phase==="scanning"} label={phase==="done"?`${inv.length} items confirmed →`:"Skip for now →"}/></OBBtn><style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style></Screen>);}
+function OB_Inventory({inv,sinv,go}){
+  const[phase,setPhase]=useState("idle");
+  const[items,setItems]=useState(inv.length?inv:[]);
+  const[newName,setNewName]=useState("");
+  const[newQty,setNewQty]=useState("");
+  const[newCat,setNewCat]=useState("Vegetables");
+  const CATS=["Vegetables","Protein","Dairy","Grains","Legumes","Pantry","Citrus","Aromatics","Dairy alt","Other"];
+  const scan=()=>{setPhase("scanning");setTimeout(()=>{const merged=[...items,...INV_SEED.filter(s=>!items.find(i=>i.name===s.name))];setItems(merged);sinv(merged);setPhase("done");},2200);};
+  const addItem=()=>{
+    if(!newName.trim())return;
+    const item={id:Date.now(),name:newName.trim(),cat:newCat,qty:newQty.trim()||"1 unit",d:14};
+    const updated=[...items,item];setItems(updated);sinv(updated);
+    setNewName("");setNewQty("");
+  };
+  const removeItem=(id)=>{const updated=items.filter(i=>i.id!==id);setItems(updated);sinv(updated);};
+  return(
+    <Screen>
+      <Dots n={12} cur={10}/>
+      <Hdr icon={Icon.scan} title="What's in your kitchen?" sub="Scan with your camera or add items yourself. Every recipe uses only what you have."/>
+      <OBScroll>
+        <div style={{display:"flex",flexDirection:"column",gap:12,paddingTop:8}}>
+          {phase==="idle"&&(
+            <>
+              <div onClick={scan} style={{border:`1.5px dashed ${C.brd}`,borderRadius:14,padding:"20px",display:"flex",flexDirection:"column",alignItems:"center",gap:8,background:C.wh,cursor:"pointer"}}>
+                <div style={{color:C.g3}}>{Icon.scan}</div>
+                <p style={{fontSize:14,fontWeight:700,color:C.dk}}>Scan your kitchen</p>
+                <p style={{fontSize:12,color:C.mu,textAlign:"center",lineHeight:1.6}}>AI identifies items, quantities, and freshness from photos.</p>
+                <span style={{padding:"8px 18px",borderRadius:20,background:C.g2,color:C.wh,fontSize:13,fontWeight:700}}>Open camera</span>
+              </div>
+              <div style={{textAlign:"center",fontSize:12,color:C.mu}}>— or add manually —</div>
+            </>
+          )}
+          {phase==="scanning"&&(
+            <div style={{padding:"28px 24px",borderRadius:14,background:C.g6,border:`1.5px solid ${C.g5}`,textAlign:"center"}}>
+              <div style={{color:C.g3,marginBottom:10,display:"inline-block",animation:"spin 1.2s linear infinite"}}>{Icon.refresh}</div>
+              <p style={{fontSize:14,fontWeight:700,color:C.g1}}>Scanning kitchen...</p>
+            </div>
+          )}
+          {/* Manual add form — always visible once scan is done or if idle */}
+          {phase!=="scanning"&&(
+            <div style={{background:C.wh,borderRadius:14,padding:"14px",border:`1.5px solid ${C.brd}`}}>
+              <p style={{fontSize:11,fontWeight:700,color:C.mu,textTransform:"uppercase",letterSpacing:"0.7px",marginBottom:12}}>Add an item</p>
+              <div style={{display:"flex",flexDirection:"column",gap:9}}>
+                <input value={newName} onChange={e=>setNewName(e.target.value)}
+                  onKeyDown={e=>e.key==="Enter"&&addItem()}
+                  placeholder="Item name e.g. Chicken breast" style={inp}/>
+                <div style={{display:"flex",gap:8}}>
+                  <input value={newQty} onChange={e=>setNewQty(e.target.value)}
+                    onKeyDown={e=>e.key==="Enter"&&addItem()}
+                    placeholder="Qty e.g. 500g" style={{...inp,flex:1}}/>
+                  <select value={newCat} onChange={e=>setNewCat(e.target.value)}
+                    style={{...inp,flex:1,cursor:"pointer"}}>
+                    {CATS.map(c=><option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <button onClick={addItem} style={{padding:"11px",borderRadius:10,border:"none",
+                  background:newName.trim()?C.g2:C.lt,color:C.wh,fontSize:13,fontWeight:700,
+                  cursor:newName.trim()?"pointer":"not-allowed",fontFamily:"'DM Sans',sans-serif",
+                  display:"flex",alignItems:"center",justifyContent:"center",gap:7}}>
+                  {Icon.plus} Add to kitchen
+                </button>
+              </div>
+            </div>
+          )}
+          {items.length>0&&(
+            <>
+              <div style={{padding:"10px 14px",borderRadius:10,background:C.g6,border:`1px solid ${C.g5}`}}>
+                <p style={{fontSize:12,color:C.g1,fontWeight:700}}>{items.length} item{items.length!==1?"s":""} in your kitchen</p>
+              </div>
+              <div style={{display:"flex",flexDirection:"column",gap:7}}>
+                {items.map(item=>{
+                  const col=item.d<=3?C.r2:item.d<=7?C.o2:C.g2;
+                  return(
+                    <div key={item.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",
+                      padding:"10px 12px",borderRadius:10,background:C.wh,borderLeft:`3px solid ${col}`}}>
+                      <div>
+                        <p style={{fontSize:13,fontWeight:700,color:C.dk}}>{item.name}</p>
+                        <p style={{fontSize:11,color:C.mu}}>{item.cat} · {item.qty}</p>
+                      </div>
+                      <button onClick={()=>removeItem(item.id)} style={{background:"none",border:"none",
+                        color:C.r2,cursor:"pointer",padding:"4px",display:"flex"}}>
+                        {Icon.x}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      </OBScroll>
+      <OBBtn>
+        <Btn onClick={go} disabled={phase==="scanning"}
+          label={items.length>0?`${items.length} items confirmed →`:"Skip for now →"}/>
+      </OBBtn>
+      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
+    </Screen>
+  );
+}
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 const TABS=[{k:"home",l:"Home",icon:Icon.home},{k:"plan",l:"Plan",icon:Icon.calendar},{k:"mealbank",l:"Meals",icon:Icon.bookmark},{k:"kitchen",l:"Kitchen",icon:Icon.box},{k:"shop",l:"Shop",icon:Icon.cart}];
@@ -164,7 +262,22 @@ function MainApp({profile,macros,inv,mealbank,setMealbank,weeklyPlan,setWeeklyPl
 
   // ── RECIPE GENERATION via our secure API route ──
   const generateRecipes=async()=>{
-    const res=await fetch("/api/generate-recipes",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({inventory:inv,macros,cuisines:profile.cuisines||[],allergens:profile.allergens||[],dislikes:profile.dislikes||[],goals:profile.goals||[]})});
+    // Pull the last 14 recipe titles from the meal bank to tell the AI what NOT to repeat
+    const recentTitles = mealbank.slice(-14).map(r=>r.title).filter(Boolean);
+    // Random seed forces a different creative direction every call
+    const sessionSeed = Math.random().toString(36).slice(2,10);
+    // Save seed to localStorage so rapid re-taps still get variety
+    localStorage.setItem('savorly_last_seed', sessionSeed);
+    const res=await fetch("/api/generate-recipes",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+      inventory:inv,
+      macros,
+      cuisines:profile.cuisines||[],
+      allergens:profile.allergens||[],
+      dislikes:profile.dislikes||[],
+      goals:profile.goals||[],
+      recentTitles,
+      sessionSeed,
+    })});
     if(!res.ok)throw new Error("Generation failed");
     const{recipes}=await res.json();
     return recipes;
@@ -549,6 +662,15 @@ function MainApp({profile,macros,inv,mealbank,setMealbank,weeklyPlan,setWeeklyPl
               <div style={{padding:"12px 14px",borderRadius:12,background:C.g6,border:`1px solid ${C.g5}`,display:"flex",gap:10,alignItems:"flex-start"}}>
                 <span style={{color:C.g3,flexShrink:0,marginTop:1}}>{Icon.clock}</span>
                 <p style={{fontSize:13,color:C.g1,fontWeight:600,lineHeight:1.5}}>{r.prepTip}</p>
+              </div>
+            )}
+            {r.chefTip&&(
+              <div style={{padding:"12px 14px",borderRadius:12,background:C.o5,border:`1px solid ${C.o4}`,display:"flex",gap:10,alignItems:"flex-start"}}>
+                <span style={{color:C.o2,flexShrink:0,marginTop:1}}>{Icon.chef}</span>
+                <div>
+                  <p style={{fontSize:10,fontWeight:800,color:C.o2,textTransform:"uppercase",letterSpacing:"0.6px",marginBottom:4}}>Chef's tip</p>
+                  <p style={{fontSize:13,color:C.o1,fontWeight:500,lineHeight:1.6}}>{r.chefTip}</p>
+                </div>
               </div>
             )}
             {(r.ingredients||[]).length>0&&(
