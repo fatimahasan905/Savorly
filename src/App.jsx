@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { saveProfile, loadProfile, saveMealBank, loadMealBank,
          saveInventory, loadInventory, saveWeeklyPlan, loadWeeklyPlan,
          signUp, signIn, signOut, getUser } from "./lib/supabase.js";
@@ -128,18 +128,91 @@ function AuthScreen({onComplete}){
 // ─── ONBOARDING ───────────────────────────────────────────────────────────────
 function Welcome({go}){return(<div style={{minHeight:"100vh",background:C.g2,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"52px 32px",textAlign:"center",fontFamily:"'DM Sans',sans-serif",maxWidth:430,margin:"0 auto"}}><div style={{width:60,height:60,borderRadius:18,background:"rgba(255,255,255,0.12)",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:26,color:"rgba(255,255,255,0.9)"}}><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M12 2a9 9 0 00-9 9c0 6 9 13 9 13s9-7 9-13a9 9 0 00-9-9z"/><circle cx="12" cy="10" r="3"/></svg></div><h1 style={{fontFamily:"'Fraunces',serif",fontSize:44,color:C.wh,marginBottom:8,lineHeight:1.05,fontWeight:700}}>Savorly</h1><p style={{color:"rgba(255,255,255,0.65)",fontSize:15,marginBottom:8,lineHeight:1.6}}>Your personal kitchen intelligence.</p><p style={{color:"rgba(255,255,255,0.4)",fontSize:13,marginBottom:52,lineHeight:1.7}}>Recipes built from what you have.<br/>Macros calibrated to your body.<br/>Zero waste. Zero guesswork.</p><button onClick={go} style={{width:"100%",maxWidth:280,padding:"16px",borderRadius:14,border:"none",background:C.wh,color:C.g2,fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>Get started →</button><p style={{color:"rgba(255,255,255,0.25)",fontSize:11,marginTop:18}}>3-minute setup · All data saved to your account</p></div>);}
 
-function OB_Name({p,sp,go}){return(<Screen><Dots n={12} cur={0}/><Hdr icon={Icon.user} title="Nice to meet you." sub="Your name and biological sex — for macro calculations only."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:18,paddingTop:8}}><div><label style={lbl}>First name</label><input value={p.name} onChange={e=>sp({...p,name:e.target.value})} placeholder="What do we call you?" style={inp}/></div><div><label style={lbl}>Biological sex</label><div style={{display:"flex",gap:10}}>{["Male","Female"].map(s=>(<button key={s} onClick={()=>sp({...p,sex:s.toLowerCase()})} style={{flex:1,padding:"14px",borderRadius:12,cursor:"pointer",border:`1.5px solid ${p.sex===s.toLowerCase()?C.g2:C.brd}`,background:p.sex===s.toLowerCase()?C.g6:C.wh,fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:14,color:p.sex===s.toLowerCase()?C.g2:C.md}}>{s}</button>))}</div></div></div></OBScroll><OBBtn><Btn onClick={go} disabled={!p.name||!p.sex}/></OBBtn></Screen>);}
+function OB_Name({p,sp,go}){return(<Screen><Dots n={14} cur={0}/><Hdr icon={Icon.user} title="Nice to meet you." sub="Your name and biological sex — for macro calculations only."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:18,paddingTop:8}}><div><label style={lbl}>First name</label><input value={p.name} onChange={e=>sp({...p,name:e.target.value})} placeholder="What do we call you?" style={inp}/></div><div><label style={lbl}>Biological sex</label><div style={{display:"flex",gap:10}}>{["Male","Female"].map(s=>(<button key={s} onClick={()=>sp({...p,sex:s.toLowerCase()})} style={{flex:1,padding:"14px",borderRadius:12,cursor:"pointer",border:`1.5px solid ${p.sex===s.toLowerCase()?C.g2:C.brd}`,background:p.sex===s.toLowerCase()?C.g6:C.wh,fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:14,color:p.sex===s.toLowerCase()?C.g2:C.md}}>{s}</button>))}</div></div></div></OBScroll><OBBtn><Btn onClick={go} disabled={!p.name||!p.sex}/></OBBtn></Screen>);}
 
-function OB_Body({p,sp,go}){const tog=k=>sp(prev=>{const gs=prev.goals||[];return{...prev,goals:gs.includes(k)?gs.filter(x=>x!==k):[...gs,k]};});return(<Screen><Dots n={12} cur={1}/><Hdr icon={Icon.settings} title={`Alright, ${p.name||"friend"}.`} sub="Body stats for macro targets. Then every goal you're working toward — select all that apply."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:14,paddingTop:8}}><div style={{display:"flex",gap:10}}>{[["age","Age","28"],["weight","Weight kg","65"],["height","Height cm","165"]].map(([k,l,ph])=>(<div key={k} style={{flex:1}}><label style={lbl}>{l}</label><input type="number" value={p[k]||""} onChange={e=>sp({...p,[k]:e.target.value})} placeholder={ph} style={{...inp,padding:"12px 10px"}}/></div>))}</div><div><label style={{...lbl,marginBottom:12}}>Goals (select all that apply)</label><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>{GOALS.map(g=>{const on=(p.goals||[]).includes(g.k);return(<button key={g.k} onClick={()=>tog(g.k)} style={{padding:"12px",borderRadius:12,textAlign:"left",cursor:"pointer",border:`1.5px solid ${on?C.g2:C.brd}`,background:on?C.g6:C.wh,fontFamily:"'DM Sans',sans-serif"}}><div style={{fontSize:13,fontWeight:700,color:on?C.g2:C.dk}}>{g.l}</div><div style={{fontSize:11,color:C.mu,marginTop:2}}>{g.d}</div></button>);})}</div></div></div></OBScroll><OBBtn><Btn onClick={go} disabled={!p.age||!p.weight||!p.height||!(p.goals||[]).length}/></OBBtn></Screen>);}
+function OB_Body({p,sp,go}){const tog=k=>sp(prev=>{const gs=prev.goals||[];return{...prev,goals:gs.includes(k)?gs.filter(x=>x!==k):[...gs,k]};});return(<Screen><Dots n={14} cur={1}/><Hdr icon={Icon.settings} title={`Alright, ${p.name||"friend"}.`} sub="Body stats for macro targets. Then every goal you're working toward — select all that apply."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:14,paddingTop:8}}><div style={{display:"flex",gap:10}}>{[["age","Age","28"],["weight","Weight kg","65"],["height","Height cm","165"]].map(([k,l,ph])=>(<div key={k} style={{flex:1}}><label style={lbl}>{l}</label><input type="number" value={p[k]||""} onChange={e=>sp({...p,[k]:e.target.value})} placeholder={ph} style={{...inp,padding:"12px 10px"}}/></div>))}</div><div><label style={{...lbl,marginBottom:12}}>Goals (select all that apply)</label><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>{GOALS.map(g=>{const on=(p.goals||[]).includes(g.k);return(<button key={g.k} onClick={()=>tog(g.k)} style={{padding:"12px",borderRadius:12,textAlign:"left",cursor:"pointer",border:`1.5px solid ${on?C.g2:C.brd}`,background:on?C.g6:C.wh,fontFamily:"'DM Sans',sans-serif"}}><div style={{fontSize:13,fontWeight:700,color:on?C.g2:C.dk}}>{g.l}</div><div style={{fontSize:11,color:C.mu,marginTop:2}}>{g.d}</div></button>);})}</div></div></div></OBScroll><OBBtn><Btn onClick={go} disabled={!p.age||!p.weight||!p.height||!(p.goals||[]).length}/></OBBtn></Screen>);}
 
-function OB_Meals({p,sp,go}){const slots=["Breakfast","Lunch","Snack","Dinner","Second snack","Supper"];const cookDays=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];const togSlot=s=>sp(prev=>{const ms=prev.mealtimes||[];return{...prev,mealtimes:ms.includes(s)?ms.filter(x=>x!==s):[...ms,s]};});const togCook=d=>sp(prev=>{const cd=prev.cookDays||[];return{...prev,cookDays:cd.includes(d)?cd.filter(x=>x!==d):[...cd,d]};});return(<Screen><Dots n={12} cur={2}/><Hdr icon={Icon.sun} title="How do you eat day-to-day?" sub="Select every meal you typically have. Then tell us when you prefer to cook."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:18,paddingTop:8}}><div><label style={lbl}>Daily meals</label><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{slots.map(s=>(<Pill key={s} label={s} on={(p.mealtimes||[]).includes(s)} toggle={()=>togSlot(s)}/>))}</div></div><div><label style={lbl}>Preferred cook days</label><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{cookDays.map(d=>(<Pill key={d} label={d.slice(0,3)} on={(p.cookDays||[]).includes(d)} toggle={()=>togCook(d)}/>))}</div>{(p.cookDays||[]).length>0&&(<p style={{fontSize:12,color:C.mu,marginTop:8}}>Meal prep batches built for {(p.cookDays||[]).join(" and ")}.</p>)}</div></div></OBScroll><OBBtn><Btn onClick={go} disabled={!(p.mealtimes||[]).length}/></OBBtn></Screen>);}
-function OB_Health({h,sh,go}){const tog=c=>sh(p=>p.includes(c)?p.filter(x=>x!==c):[...p,c]);return(<Screen><Dots n={12} cur={3}/><Hdr icon={Icon.warning} title="Any health considerations?" sub="We'll adjust macro guidance and flag relevant ingredients. Skip if none apply."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:14,paddingTop:8}}><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{HC.map(c=><Pill key={c} label={c} on={h.includes(c)} toggle={()=>tog(c)} color={C.o2} bg={C.o5}/>)}</div>{h.length>0&&(<div style={{padding:"13px 15px",borderRadius:10,background:C.o5,border:`1px solid ${C.o4}`}}><p style={{fontSize:12,color:C.o1,fontWeight:700,lineHeight:1.5}}>Adjusting for: {h.join(", ")}.</p></div>)}</div></OBScroll><OBBtn><Btn onClick={go} label={h.length===0?"None — skip →":"Continue →"}/></OBBtn></Screen>);}
-function OB_Macros({p,macros,setMacros,go}){const calc=calcMacros(p);useEffect(()=>{setMacros(calc);},[]);const adj=(k,v)=>setMacros(mx=>({...mx,[k]:Math.max(0,mx[k]+v)}));return(<Screen><Dots n={12} cur={4}/><Hdr icon={Icon.fire} title="Your daily targets." sub="Calculated from your stats and goals. Fine-tune below."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:14,paddingTop:8}}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>{[{k:"calories",unit:"kcal",l:"Calories",c:C.o2,bg:C.o5},{k:"protein",unit:"g",l:"Protein",c:C.g2,bg:C.g6}].map(x=>(<div key={x.k} style={{padding:"18px 14px",borderRadius:14,background:x.bg,border:`1.5px solid ${x.c}30`,textAlign:"center"}}><div style={{fontFamily:"'Fraunces',serif",fontSize:36,color:x.c,fontWeight:700}}>{macros[x.k]||calc[x.k]}</div><div style={{fontSize:10,color:C.mu,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px",marginTop:3}}>{x.unit} · {x.l}</div></div>))}</div><div style={{background:C.wh,borderRadius:12,padding:"16px",border:`1.5px solid ${C.brd}`}}>{[{k:"calories",step:50},{k:"protein",step:5}].map(({k,step})=>(<div key={k} style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}><span style={{fontSize:13,fontWeight:700,color:C.md,textTransform:"capitalize"}}>{k}</span><div style={{display:"flex",alignItems:"center",gap:10}}><button onClick={()=>adj(k,-step)} style={{width:30,height:30,borderRadius:8,border:`1.5px solid ${C.brd}`,background:C.bg,color:C.md,fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>−</button><span style={{fontSize:14,fontWeight:700,color:C.dk,minWidth:48,textAlign:"center"}}>{macros[k]||calc[k]}</span><button onClick={()=>adj(k,step)} style={{width:30,height:30,borderRadius:8,border:`1.5px solid ${C.brd}`,background:C.bg,color:C.md,fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>+</button></div></div>))}</div></div></OBScroll><OBBtn><Btn onClick={go} label="Looks good →"/></OBBtn></Screen>);}
-function OB_Allergens({al,sal,go}){const tog=a=>sal(p=>p.includes(a)?p.filter(x=>x!==a):[...p,a]);return(<Screen><Dots n={12} cur={5}/><Hdr icon={Icon.warning} title="Allergies or intolerances?" sub="Including lactose. Permanently excluded from every recipe and shopping suggestion."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:14,paddingTop:8}}><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{ALLERGENS.map(a=><Pill key={a} label={a} on={al.includes(a)} toggle={()=>tog(a)} color={C.r2} bg={C.r5}/>)}</div>{al.length>0&&(<div style={{padding:"13px 15px",borderRadius:10,background:C.r5,border:`1px solid ${C.r4}`}}><p style={{fontSize:12,color:C.r1,fontWeight:700}}>Permanently excluded: {al.join(", ")}.</p></div>)}</div></OBScroll><OBBtn><Btn onClick={go} label={al.length===0?"No allergies — skip →":"Continue →"}/></OBBtn></Screen>);}
-function OB_Subs({al,go}){const[sel,setSel]=useState({});const togSub=(allergen,sub)=>setSel(p=>({...p,[allergen]:p[allergen]===sub.a?null:sub.a}));const relevant=al.filter(a=>SUBS[a]);return(<Screen><Dots n={12} cur={6}/><Hdr icon={Icon.refresh} title="Your substitutes." sub="Pick your preferred swap per allergen."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:18,paddingTop:8}}>{relevant.length===0?(<div style={{padding:"24px",borderRadius:12,background:C.g6,textAlign:"center"}}><p style={{fontSize:14,color:C.g1,fontWeight:700}}>No substitutes needed.</p></div>):relevant.map(allergen=>(<div key={allergen}><p style={{fontSize:11,fontWeight:700,color:C.mu,textTransform:"uppercase",letterSpacing:"0.7px",marginBottom:10}}>Instead of {allergen}</p><div style={{display:"flex",flexDirection:"column",gap:8}}>{SUBS[allergen].map(sub=>{const on=sel[allergen]===sub.a;return(<button key={sub.a} onClick={()=>togSub(allergen,sub)} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 14px",borderRadius:12,cursor:"pointer",border:`1.5px solid ${on?C.g2:C.brd}`,background:on?C.g6:C.wh,fontFamily:"'DM Sans',sans-serif",textAlign:"left"}}><div><p style={{fontSize:13,fontWeight:700,color:on?C.g2:C.dk}}>{sub.a}</p><p style={{fontSize:11,color:C.mu,marginTop:2}}>{sub.n}</p></div>{on&&<div style={{color:C.g3}}>{Icon.check}</div>}</button>);})}</div></div>))}</div></OBScroll><OBBtn><Btn onClick={go} label="Continue →"/></OBBtn></Screen>);}
-function OB_Cuisines({cu,scu,go}){const tog=c=>scu(p=>p.includes(c)?p.filter(x=>x!==c):[...p,c]);return(<Screen><Dots n={12} cur={7}/><Hdr icon={Icon.bookmark} title="What cuisines do you love?" sub="Pick as many as you want."/><OBScroll><div style={{paddingTop:8}}><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{CU.map(c=><Pill key={c} label={c} on={cu.includes(c)} toggle={()=>tog(c)}/>)}</div></div></OBScroll><OBBtn><Btn onClick={go} disabled={cu.length===0} label={cu.length>0?`${cu.length} selected →`:"Pick at least one →"}/></OBBtn></Screen>);}
-function OB_Faves({meals,setMeals,go}){const tog=(cat,item)=>setMeals(m=>({...m,[cat]:m[cat].includes(item)?m[cat].filter(x=>x!==item):[...m[cat],item]}));return(<Screen><Dots n={12} cur={8}/><Hdr icon={Icon.chef} title="What do you usually eat?" sub="Tap anything you've made or genuinely enjoyed."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:20,paddingTop:8}}>{[{key:"breakfast",l:"Breakfasts",data:BF},{key:"lunch",l:"Lunches",data:LN},{key:"dinner",l:"Dinners",data:DN}].map(s=>(<div key={s.key}><p style={{fontSize:11,fontWeight:700,color:C.mu,marginBottom:10,textTransform:"uppercase",letterSpacing:"0.7px"}}>{s.l}</p><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{s.data.map(item=><Pill key={item} label={item} on={meals[s.key].includes(item)} toggle={()=>tog(s.key,item)}/>)}</div></div>))}</div></OBScroll><OBBtn><Btn onClick={go} label="These are mine →"/></OBBtn></Screen>);}
-function OB_Confess({dis,sdis,go}){const[quip,setQuip]=useState("");const[custom,setCustom]=useState("");const tog=item=>{if(!dis.includes(item))setQuip(QUIPS[item]||"Noted. Gone.");sdis(p=>p.includes(item)?p.filter(x=>x!==item):[...p,item]);};const addCustom=()=>{if(custom.trim()&&!dis.includes(custom.trim())){sdis(p=>[...p,custom.trim()]);setQuip(`${custom.trim()} — banished. No questions asked.`);setCustom("");}};return(<Screen><Dots n={12} cur={9}/><div style={{padding:"14px 24px 8px",flexShrink:0}}><div style={{color:C.r2,marginBottom:10}}>{Icon.x}</div><h2 style={{fontFamily:"'Fraunces',serif",fontSize:25,color:C.dk,marginBottom:5,fontWeight:700}}>The Confession Booth.</h2><p style={{color:C.mu,fontSize:13,lineHeight:1.6}}>Tell us what has personally wronged you. We will not judge. (Much.)</p></div>{quip&&(<div style={{margin:"0 24px 8px",padding:"11px 14px",borderRadius:10,background:C.g6,border:`1px solid ${C.g5}`,flexShrink:0}}><p style={{fontSize:13,color:C.g1,fontWeight:700,fontStyle:"italic"}}>{quip}</p></div>)}<OBScroll><div style={{display:"flex",flexDirection:"column",gap:14,paddingTop:4}}><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{HL.map(item=>(<button key={item} onClick={()=>tog(item)} style={{padding:"8px 14px",borderRadius:20,border:`1.5px solid ${dis.includes(item)?C.r2:C.brd}`,background:dis.includes(item)?C.r5:C.wh,color:dis.includes(item)?C.r1:C.mu,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all 0.15s",textDecoration:dis.includes(item)?"line-through":"none"}}>{item}</button>))}</div><div style={{display:"flex",gap:8}}><input value={custom} onChange={e=>setCustom(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addCustom()} placeholder="Add your own nemesis ingredient..." style={{...inp,flex:1}}/><button onClick={addCustom} style={{padding:"10px 14px",borderRadius:10,border:"none",background:C.g2,color:C.wh,cursor:"pointer",display:"flex",alignItems:"center"}}>{Icon.plus}</button></div>{dis.length>0&&(<p style={{fontSize:12,color:C.mu}}>Blacklisted: {dis.slice(0,5).join(", ")}{dis.length>5?` + ${dis.length-5} more`:""}</p>)}</div></OBScroll><OBBtn><Btn onClick={go} label={dis.length===0?"I eat everything → (respect)":`Banish these ${dis.length} →`}/></OBBtn></Screen>);}
+function OB_Meals({p,sp,go}){const slots=["Breakfast","Lunch","Snack","Dinner","Second snack","Supper"];const cookDays=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];const togSlot=s=>sp(prev=>{const ms=prev.mealtimes||[];return{...prev,mealtimes:ms.includes(s)?ms.filter(x=>x!==s):[...ms,s]};});const togCook=d=>sp(prev=>{const cd=prev.cookDays||[];return{...prev,cookDays:cd.includes(d)?cd.filter(x=>x!==d):[...cd,d]};});return(<Screen><Dots n={14} cur={2}/><Hdr icon={Icon.sun} title="How do you eat day-to-day?" sub="Select every meal you typically have. Then tell us when you prefer to cook."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:18,paddingTop:8}}><div><label style={lbl}>Daily meals</label><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{slots.map(s=>(<Pill key={s} label={s} on={(p.mealtimes||[]).includes(s)} toggle={()=>togSlot(s)}/>))}</div></div><div><label style={lbl}>Preferred cook days</label><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{cookDays.map(d=>(<Pill key={d} label={d.slice(0,3)} on={(p.cookDays||[]).includes(d)} toggle={()=>togCook(d)}/>))}</div>{(p.cookDays||[]).length>0&&(<p style={{fontSize:12,color:C.mu,marginTop:8}}>Meal prep batches built for {(p.cookDays||[]).join(" and ")}.</p>)}</div></div></OBScroll><OBBtn><Btn onClick={go} disabled={!(p.mealtimes||[]).length}/></OBBtn></Screen>);}
+function OB_Health({h,sh,go}){const tog=c=>sh(p=>p.includes(c)?p.filter(x=>x!==c):[...p,c]);return(<Screen><Dots n={14} cur={3}/><Hdr icon={Icon.warning} title="Any health considerations?" sub="We'll adjust macro guidance and flag relevant ingredients. Skip if none apply."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:14,paddingTop:8}}><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{HC.map(c=><Pill key={c} label={c} on={h.includes(c)} toggle={()=>tog(c)} color={C.o2} bg={C.o5}/>)}</div>{h.length>0&&(<div style={{padding:"13px 15px",borderRadius:10,background:C.o5,border:`1px solid ${C.o4}`}}><p style={{fontSize:12,color:C.o1,fontWeight:700,lineHeight:1.5}}>Adjusting for: {h.join(", ")}.</p></div>)}</div></OBScroll><OBBtn><Btn onClick={go} label={h.length===0?"None — skip →":"Continue →"}/></OBBtn></Screen>);}
+function OB_Macros({p,macros,setMacros,go}){const calc=calcMacros(p);useEffect(()=>{setMacros(calc);},[]);const adj=(k,v)=>setMacros(mx=>({...mx,[k]:Math.max(0,mx[k]+v)}));return(<Screen><Dots n={14} cur={4}/><Hdr icon={Icon.fire} title="Your daily targets." sub="Calculated from your stats and goals. Fine-tune below."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:14,paddingTop:8}}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>{[{k:"calories",unit:"kcal",l:"Calories",c:C.o2,bg:C.o5},{k:"protein",unit:"g",l:"Protein",c:C.g2,bg:C.g6}].map(x=>(<div key={x.k} style={{padding:"18px 14px",borderRadius:14,background:x.bg,border:`1.5px solid ${x.c}30`,textAlign:"center"}}><div style={{fontFamily:"'Fraunces',serif",fontSize:36,color:x.c,fontWeight:700}}>{macros[x.k]||calc[x.k]}</div><div style={{fontSize:10,color:C.mu,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px",marginTop:3}}>{x.unit} · {x.l}</div></div>))}</div><div style={{background:C.wh,borderRadius:12,padding:"16px",border:`1.5px solid ${C.brd}`}}>{[{k:"calories",step:50},{k:"protein",step:5}].map(({k,step})=>(<div key={k} style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}><span style={{fontSize:13,fontWeight:700,color:C.md,textTransform:"capitalize"}}>{k}</span><div style={{display:"flex",alignItems:"center",gap:10}}><button onClick={()=>adj(k,-step)} style={{width:30,height:30,borderRadius:8,border:`1.5px solid ${C.brd}`,background:C.bg,color:C.md,fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>−</button><span style={{fontSize:14,fontWeight:700,color:C.dk,minWidth:48,textAlign:"center"}}>{macros[k]||calc[k]}</span><button onClick={()=>adj(k,step)} style={{width:30,height:30,borderRadius:8,border:`1.5px solid ${C.brd}`,background:C.bg,color:C.md,fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>+</button></div></div>))}</div></div></OBScroll><OBBtn><Btn onClick={go} label="Looks good →"/></OBBtn></Screen>);}
+function OB_Allergens({al,sal,go}){const tog=a=>sal(p=>p.includes(a)?p.filter(x=>x!==a):[...p,a]);return(<Screen><Dots n={14} cur={5}/><Hdr icon={Icon.warning} title="Allergies or intolerances?" sub="Including lactose. Permanently excluded from every recipe and shopping suggestion."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:14,paddingTop:8}}><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{ALLERGENS.map(a=><Pill key={a} label={a} on={al.includes(a)} toggle={()=>tog(a)} color={C.r2} bg={C.r5}/>)}</div>{al.length>0&&(<div style={{padding:"13px 15px",borderRadius:10,background:C.r5,border:`1px solid ${C.r4}`}}><p style={{fontSize:12,color:C.r1,fontWeight:700}}>Permanently excluded: {al.join(", ")}.</p></div>)}</div></OBScroll><OBBtn><Btn onClick={go} label={al.length===0?"No allergies — skip →":"Continue →"}/></OBBtn></Screen>);}
+function OB_Subs({al,go}){const[sel,setSel]=useState({});const togSub=(allergen,sub)=>setSel(p=>({...p,[allergen]:p[allergen]===sub.a?null:sub.a}));const relevant=al.filter(a=>SUBS[a]);return(<Screen><Dots n={14} cur={6}/><Hdr icon={Icon.refresh} title="Your substitutes." sub="Pick your preferred swap per allergen."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:18,paddingTop:8}}>{relevant.length===0?(<div style={{padding:"24px",borderRadius:12,background:C.g6,textAlign:"center"}}><p style={{fontSize:14,color:C.g1,fontWeight:700}}>No substitutes needed.</p></div>):relevant.map(allergen=>(<div key={allergen}><p style={{fontSize:11,fontWeight:700,color:C.mu,textTransform:"uppercase",letterSpacing:"0.7px",marginBottom:10}}>Instead of {allergen}</p><div style={{display:"flex",flexDirection:"column",gap:8}}>{SUBS[allergen].map(sub=>{const on=sel[allergen]===sub.a;return(<button key={sub.a} onClick={()=>togSub(allergen,sub)} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 14px",borderRadius:12,cursor:"pointer",border:`1.5px solid ${on?C.g2:C.brd}`,background:on?C.g6:C.wh,fontFamily:"'DM Sans',sans-serif",textAlign:"left"}}><div><p style={{fontSize:13,fontWeight:700,color:on?C.g2:C.dk}}>{sub.a}</p><p style={{fontSize:11,color:C.mu,marginTop:2}}>{sub.n}</p></div>{on&&<div style={{color:C.g3}}>{Icon.check}</div>}</button>);})}</div></div>))}</div></OBScroll><OBBtn><Btn onClick={go} label="Continue →"/></OBBtn></Screen>);}
+function OB_Cuisines({cu,scu,go}){const tog=c=>scu(p=>p.includes(c)?p.filter(x=>x!==c):[...p,c]);return(<Screen><Dots n={14} cur={7}/><Hdr icon={Icon.bookmark} title="What cuisines do you love?" sub="Pick as many as you want."/><OBScroll><div style={{paddingTop:8}}><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{CU.map(c=><Pill key={c} label={c} on={cu.includes(c)} toggle={()=>tog(c)}/>)}</div></div></OBScroll><OBBtn><Btn onClick={go} disabled={cu.length===0} label={cu.length>0?`${cu.length} selected →`:"Pick at least one →"}/></OBBtn></Screen>);}
+function OB_Faves({meals,setMeals,go}){const tog=(cat,item)=>setMeals(m=>({...m,[cat]:m[cat].includes(item)?m[cat].filter(x=>x!==item):[...m[cat],item]}));return(<Screen><Dots n={14} cur={8}/><Hdr icon={Icon.chef} title="What do you usually eat?" sub="Tap anything you've made or genuinely enjoyed."/><OBScroll><div style={{display:"flex",flexDirection:"column",gap:20,paddingTop:8}}>{[{key:"breakfast",l:"Breakfasts",data:BF},{key:"lunch",l:"Lunches",data:LN},{key:"dinner",l:"Dinners",data:DN}].map(s=>(<div key={s.key}><p style={{fontSize:11,fontWeight:700,color:C.mu,marginBottom:10,textTransform:"uppercase",letterSpacing:"0.7px"}}>{s.l}</p><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{s.data.map(item=><Pill key={item} label={item} on={meals[s.key].includes(item)} toggle={()=>tog(s.key,item)}/>)}</div></div>))}</div></OBScroll><OBBtn><Btn onClick={go} label="These are mine →"/></OBBtn></Screen>);}
+
+function OB_RecentMeals({recent,setRecent,go}){
+  const[input,setInput]=useState("");
+  const add=()=>{
+    const v=input.trim();
+    if(!v)return;
+    if(!recent.includes(v))setRecent(p=>[...p,v]);
+    setInput("");
+  };
+  const remove=(i)=>setRecent(p=>p.filter((_,idx)=>idx!==i));
+  const examples=["Butter chicken","Shakshuka","Avocado toast","Pasta bolognese","Chicken stir fry","Lentil soup","Fried rice","Grilled salmon"];
+  return(
+    <Screen>
+      <Dots n={14} cur={9}/>
+      <Hdr icon={Icon.bookmark} title="What have you been eating this month?" sub="Type any meals you remember making or ordering. The more you add, the better your first month of recipes — we'll build full recipes for everything you tell us."/>
+      <OBScroll>
+        <div style={{display:"flex",flexDirection:"column",gap:14,paddingTop:8}}>
+          <div style={{display:"flex",gap:8}}>
+            <input value={input} onChange={e=>setInput(e.target.value)}
+              onKeyDown={e=>e.key==="Enter"&&add()}
+              placeholder="e.g. Butter chicken, Overnight oats..."
+              style={{...inp,flex:1}}/>
+            <button onClick={add} style={{padding:"10px 14px",borderRadius:10,border:"none",
+              background:input.trim()?C.g2:C.lt,color:C.wh,cursor:input.trim()?"pointer":"not-allowed",
+              display:"flex",alignItems:"center",fontFamily:"'DM Sans',sans-serif"}}>
+              {Icon.plus}
+            </button>
+          </div>
+          {recent.length>0&&(
+            <div style={{display:"flex",flexDirection:"column",gap:7}}>
+              {recent.map((meal,i)=>(
+                <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",
+                  padding:"11px 13px",borderRadius:11,background:C.wh,border:`1.5px solid ${C.g5}`}}>
+                  <div style={{display:"flex",gap:10,alignItems:"center"}}>
+                    <div style={{width:7,height:7,borderRadius:"50%",background:C.g3,flexShrink:0}}/>
+                    <span style={{fontSize:14,fontWeight:600,color:C.dk}}>{meal}</span>
+                  </div>
+                  <button onClick={()=>remove(i)} style={{background:"none",border:"none",color:C.mu,cursor:"pointer",display:"flex",padding:4}}>{Icon.x}</button>
+                </div>
+              ))}
+              <p style={{fontSize:12,color:C.g2,fontWeight:700,textAlign:"center",paddingTop:4}}>
+                {recent.length} meal{recent.length!==1?"s":""} — we'll generate full recipes for all of these
+              </p>
+            </div>
+          )}
+          {recent.length===0&&(
+            <div>
+              <p style={{fontSize:11,fontWeight:700,color:C.mu,textTransform:"uppercase",letterSpacing:"0.7px",marginBottom:10}}>Need inspiration?</p>
+              <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+                {examples.map(e=>(
+                  <button key={e} onClick={()=>setRecent(p=>p.includes(e)?p:[...p,e])}
+                    style={{padding:"7px 13px",borderRadius:20,border:`1.5px solid ${C.brd}`,
+                      background:C.wh,color:C.mu,fontSize:12,fontWeight:600,cursor:"pointer",
+                      fontFamily:"'DM Sans',sans-serif"}}>
+                    {e}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          <div style={{padding:"13px 14px",borderRadius:11,background:C.g6,border:`1px solid ${C.g5}`}}>
+            <p style={{fontSize:12,color:C.g1,lineHeight:1.6}}>
+              We'll build your full Meal Bank from this list. The more you add now, the less you have to set up later — your first month is pre-loaded on completion.
+            </p>
+          </div>
+        </div>
+      </OBScroll>
+      <OBBtn>
+        <Btn onClick={go} label={recent.length===0?"Skip — use AI suggestions →":`Build recipes from my ${recent.length} meals →`}/>
+      </OBBtn>
+    </Screen>
+  );
+}
+function OB_Confess({dis,sdis,go}){const[quip,setQuip]=useState("");const[custom,setCustom]=useState("");const tog=item=>{if(!dis.includes(item))setQuip(QUIPS[item]||"Noted. Gone.");sdis(p=>p.includes(item)?p.filter(x=>x!==item):[...p,item]);};const addCustom=()=>{if(custom.trim()&&!dis.includes(custom.trim())){sdis(p=>[...p,custom.trim()]);setQuip(`${custom.trim()} — banished. No questions asked.`);setCustom("");}};return(<Screen><Dots n={14} cur={10}/><div style={{padding:"14px 24px 8px",flexShrink:0}}><div style={{color:C.r2,marginBottom:10}}>{Icon.x}</div><h2 style={{fontFamily:"'Fraunces',serif",fontSize:25,color:C.dk,marginBottom:5,fontWeight:700}}>The Confession Booth.</h2><p style={{color:C.mu,fontSize:13,lineHeight:1.6}}>Tell us what has personally wronged you. We will not judge. (Much.)</p></div>{quip&&(<div style={{margin:"0 24px 8px",padding:"11px 14px",borderRadius:10,background:C.g6,border:`1px solid ${C.g5}`,flexShrink:0}}><p style={{fontSize:13,color:C.g1,fontWeight:700,fontStyle:"italic"}}>{quip}</p></div>)}<OBScroll><div style={{display:"flex",flexDirection:"column",gap:14,paddingTop:4}}><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{HL.map(item=>(<button key={item} onClick={()=>tog(item)} style={{padding:"8px 14px",borderRadius:20,border:`1.5px solid ${dis.includes(item)?C.r2:C.brd}`,background:dis.includes(item)?C.r5:C.wh,color:dis.includes(item)?C.r1:C.mu,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all 0.15s",textDecoration:dis.includes(item)?"line-through":"none"}}>{item}</button>))}</div><div style={{display:"flex",gap:8}}><input value={custom} onChange={e=>setCustom(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addCustom()} placeholder="Add your own nemesis ingredient..." style={{...inp,flex:1}}/><button onClick={addCustom} style={{padding:"10px 14px",borderRadius:10,border:"none",background:C.g2,color:C.wh,cursor:"pointer",display:"flex",alignItems:"center"}}>{Icon.plus}</button></div>{dis.length>0&&(<p style={{fontSize:12,color:C.mu}}>Blacklisted: {dis.slice(0,5).join(", ")}{dis.length>5?` + ${dis.length-5} more`:""}</p>)}</div></OBScroll><OBBtn><Btn onClick={go} label={dis.length===0?"I eat everything → (respect)":`Banish these ${dis.length} →`}/></OBBtn></Screen>);}
 function OB_Inventory({inv,sinv,go}){
   const[phase,setPhase]=useState("idle");
   const[items,setItems]=useState(inv.length?inv:[]);
@@ -157,7 +230,7 @@ function OB_Inventory({inv,sinv,go}){
   const removeItem=(id)=>{const updated=items.filter(i=>i.id!==id);setItems(updated);sinv(updated);};
   return(
     <Screen>
-      <Dots n={12} cur={10}/>
+      <Dots n={14} cur={11}/>
       <Hdr icon={Icon.scan} title="What's in your kitchen?" sub="Scan with your camera or add items yourself. Every recipe uses only what you have."/>
       <OBScroll>
         <div style={{display:"flex",flexDirection:"column",gap:12,paddingTop:8}}>
@@ -631,13 +704,41 @@ function MainApp({profile,macros,inv,mealbank,setMealbank,weeklyPlan,setWeeklyPl
   }
 
   function MealBankTab(){
-    const[showAdd,setShowAdd]=useState(false);const[url,setUrl]=useState("");const[parsing,setParsing]=useState(false);const[filter,setFilter]=useState("all");const[editIdx,setEditIdx]=useState(null);const[viewRecipe,setViewRecipe]=useState(null);const[aiLoading,setAiLoading]=useState(false);const[parseErr,setParseErr]=useState("");
-    const parseUrl=async()=>{if(!url.trim())return;setParsing(true);setParseErr("");try{const rec=await parseRecipeUrl(url);updateMealBank(p=>[...p,rec]);setUrl("");setShowAdd(false);}catch(e){setParseErr("Couldn't extract that recipe. Try a direct recipe page URL.");}finally{setParsing(false);};};
+    const[panel,setPanel]=useState(null); // null | "url" | "manual"
+    const[url,setUrl]=useState("");const[parsing,setParsing]=useState(false);const[parseErr,setParseErr]=useState("");
+    const[filter,setFilter]=useState("all");
+    const[editIdx,setEditIdx]=useState(null);const[viewRecipe,setViewRecipe]=useState(null);
+    const[aiLoading,setAiLoading]=useState(false);
+    // Manual add form state
+    const[mf,setMf]=useState({title:"",mealType:"dinner",time:"",cal:"",prot:"",desc:"",ingredients:"",steps:""});
+
+    const parseUrl=async()=>{if(!url.trim())return;setParsing(true);setParseErr("");try{const rec=await parseRecipeUrl(url);updateMealBank(p=>[...p,{...rec,source:rec.source||"web"}]);setUrl("");setPanel(null);}catch(e){setParseErr("Couldn't extract that recipe. Try a direct recipe page URL.");}finally{setParsing(false);};};
     const genAi=async()=>{setAiLoading(true);try{const recs=await generateRecipes();updateMealBank(p=>[...p,...recs.map((r,i)=>({...r,id:Date.now()+i,source:"ai"}))]);setTab("mealbank");}catch{}finally{setAiLoading(false);};};
     const del=(id)=>{if(viewRecipe?.id===id)setViewRecipe(null);updateMealBank(p=>p.filter(r=>r.id!==id));};
-    const filtered=filter==="all"?mealbank:mealbank.filter(r=>r.source===filter);
-    const srcCol={tiktok:C.r2,instagram:C.o2,youtube:C.r2,web:C.g2,manual:C.g2,ai:C.g3};
-    const srcIcon={tiktok:Icon.video,instagram:Icon.link,youtube:Icon.video,web:Icon.link,manual:Icon.chef,ai:Icon.refresh};
+    const saveManual=()=>{
+      if(!mf.title.trim())return;
+      const rec={
+        id:Date.now(),source:"manual",title:mf.title.trim(),mealType:mf.mealType,
+        time:mf.time||"—",cal:parseInt(mf.cal)||0,prot:parseInt(mf.prot)||0,
+        desc:mf.desc||"",tag:"My Recipe",
+        ingredients:mf.ingredients.split("\n").filter(Boolean),
+        steps:mf.steps.split("\n").filter(Boolean),
+      };
+      updateMealBank(p=>[...p,rec]);
+      setMf({title:"",mealType:"dinner",time:"",cal:"",prot:"",desc:"",ingredients:"",steps:""});
+      setPanel(null);
+    };
+
+    const filtered = filter==="all"
+      ? [...mealbank].sort((a,b)=>{const rank=s=>s==="onboarding-manual"||s==="manual"?0:s==="onboarding-ai"||s==="ai"?1:2;return rank(a.source)-rank(b.source);})
+      : filter==="mine" ? mealbank.filter(r=>r.source==="manual"||r.source==="onboarding-manual"||r.source==="onboarding")
+      : filter==="ai"   ? mealbank.filter(r=>r.source==="ai"||r.source==="onboarding-ai")
+      : filter==="saved"? mealbank.filter(r=>["web","instagram","tiktok","youtube"].includes(r.source))
+      : mealbank.filter(r=>r.source===filter);
+
+    const srcCol={tiktok:C.r2,instagram:C.o2,youtube:C.r2,web:C.g3,manual:C.g2,ai:C.g3,"onboarding-manual":C.g2,"onboarding-ai":C.g3,onboarding:C.g2};
+    const srcIcon={tiktok:Icon.video,instagram:Icon.link,youtube:Icon.video,web:Icon.link,manual:Icon.chef,ai:Icon.refresh,"onboarding-manual":Icon.chef,"onboarding-ai":Icon.refresh,onboarding:Icon.chef};
+    const srcLabel=s=>s==="onboarding-manual"||s==="manual"?"My Recipe":s==="onboarding-ai"||s==="ai"?"AI Pick":s==="tiktok"?"TikTok":s==="instagram"?"Instagram":s==="youtube"?"YouTube":s==="web"?"Saved":s||"Saved";
 
     // ── RECIPE DETAIL VIEW ──
     if(viewRecipe){
@@ -646,59 +747,18 @@ function MainApp({profile,macros,inv,mealbank,setMealbank,weeklyPlan,setWeeklyPl
         <div style={{paddingBottom:32}}>
           <div style={{background:C.g2,padding:"20px 20px 24px"}}>
             <button onClick={()=>setViewRecipe(null)} style={{background:"rgba(255,255,255,0.15)",border:"none",color:C.wh,padding:"7px 14px",borderRadius:20,fontSize:13,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:700,marginBottom:16,display:"flex",alignItems:"center",gap:6}}>{Icon.chevL} Back</button>
-            <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:10}}><Tag label={r.source==="ai"?"AI Generated":r.source||"manual"} color="rgba(255,255,255,0.3)"/></div>
+            <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:10}}><Tag label={srcLabel(r.source)} color="rgba(255,255,255,0.3)"/></div>
             <h2 style={{fontFamily:"'Fraunces',serif",fontSize:24,color:C.wh,fontWeight:700,lineHeight:1.2,marginBottom:12}}>{r.title}</h2>
             <p style={{fontSize:13,color:"rgba(255,255,255,0.7)",lineHeight:1.6,marginBottom:14}}>{r.desc}</p>
             <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>
-              {[{i:Icon.clock,v:r.time},{i:Icon.fire,v:`${r.cal} kcal`},{i:Icon.chef,v:`${r.prot}g protein`},{i:null,v:r.tag}].map((x,i)=>x.v&&(
-                <span key={i} style={{fontSize:12,color:"rgba(255,255,255,0.75)",fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
-                  {x.i&&<span style={{opacity:0.8}}>{x.i}</span>}{x.v}
-                </span>
-              ))}
+              {[{i:Icon.clock,v:r.time},{i:Icon.fire,v:r.cal?`${r.cal} kcal`:null},{i:Icon.chef,v:r.prot?`${r.prot}g protein`:null},{i:null,v:r.tag}].map((x,i)=>x.v&&(<span key={i} style={{fontSize:12,color:"rgba(255,255,255,0.75)",fontWeight:600,display:"flex",alignItems:"center",gap:5}}>{x.i&&<span style={{opacity:0.8}}>{x.i}</span>}{x.v}</span>))}
             </div>
           </div>
           <div style={{padding:"20px 20px 0",display:"flex",flexDirection:"column",gap:24}}>
-            {r.prepTip&&(
-              <div style={{padding:"12px 14px",borderRadius:12,background:C.g6,border:`1px solid ${C.g5}`,display:"flex",gap:10,alignItems:"flex-start"}}>
-                <span style={{color:C.g3,flexShrink:0,marginTop:1}}>{Icon.clock}</span>
-                <p style={{fontSize:13,color:C.g1,fontWeight:600,lineHeight:1.5}}>{r.prepTip}</p>
-              </div>
-            )}
-            {r.chefTip&&(
-              <div style={{padding:"12px 14px",borderRadius:12,background:C.o5,border:`1px solid ${C.o4}`,display:"flex",gap:10,alignItems:"flex-start"}}>
-                <span style={{color:C.o2,flexShrink:0,marginTop:1}}>{Icon.chef}</span>
-                <div>
-                  <p style={{fontSize:10,fontWeight:800,color:C.o2,textTransform:"uppercase",letterSpacing:"0.6px",marginBottom:4}}>Chef's tip</p>
-                  <p style={{fontSize:13,color:C.o1,fontWeight:500,lineHeight:1.6}}>{r.chefTip}</p>
-                </div>
-              </div>
-            )}
-            {(r.ingredients||[]).length>0&&(
-              <div>
-                <p style={{fontSize:11,fontWeight:800,color:C.mu,textTransform:"uppercase",letterSpacing:"0.8px",marginBottom:14}}>Ingredients</p>
-                <div style={{display:"flex",flexDirection:"column",gap:0}}>
-                  {r.ingredients.map((ing,i)=>(
-                    <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:`1px solid ${C.bg3}`}}>
-                      <div style={{width:7,height:7,borderRadius:"50%",background:C.g4,flexShrink:0}}/>
-                      <span style={{fontSize:14,color:C.md,fontWeight:500}}>{ing}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {(r.steps||[]).length>0&&(
-              <div>
-                <p style={{fontSize:11,fontWeight:800,color:C.mu,textTransform:"uppercase",letterSpacing:"0.8px",marginBottom:16}}>Method</p>
-                <div style={{display:"flex",flexDirection:"column",gap:14}}>
-                  {r.steps.map((step,i)=>(
-                    <div key={i} style={{display:"flex",gap:14,alignItems:"flex-start"}}>
-                      <div style={{width:28,height:28,borderRadius:"50%",background:C.g2,color:C.wh,fontSize:12,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{i+1}</div>
-                      <p style={{fontSize:14,color:C.md,lineHeight:1.7,fontWeight:400,paddingTop:4}}>{step}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {r.prepTip&&(<div style={{padding:"12px 14px",borderRadius:12,background:C.g6,border:`1px solid ${C.g5}`,display:"flex",gap:10,alignItems:"flex-start"}}><span style={{color:C.g3,flexShrink:0,marginTop:1}}>{Icon.clock}</span><p style={{fontSize:13,color:C.g1,fontWeight:600,lineHeight:1.5}}>{r.prepTip}</p></div>)}
+            {r.chefTip&&(<div style={{padding:"12px 14px",borderRadius:12,background:C.o5,border:`1px solid ${C.o4}`,display:"flex",gap:10,alignItems:"flex-start"}}><span style={{color:C.o2,flexShrink:0,marginTop:1}}>{Icon.chef}</span><div><p style={{fontSize:10,fontWeight:800,color:C.o2,textTransform:"uppercase",letterSpacing:"0.6px",marginBottom:4}}>Chef's tip</p><p style={{fontSize:13,color:C.o1,fontWeight:500,lineHeight:1.6}}>{r.chefTip}</p></div></div>)}
+            {(r.ingredients||[]).length>0&&(<div><p style={{fontSize:11,fontWeight:800,color:C.mu,textTransform:"uppercase",letterSpacing:"0.8px",marginBottom:14}}>Ingredients</p><div style={{display:"flex",flexDirection:"column"}}>{r.ingredients.map((ing,i)=>(<div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:`1px solid ${C.bg3}`}}><div style={{width:7,height:7,borderRadius:"50%",background:C.g4,flexShrink:0}}/><span style={{fontSize:14,color:C.md,fontWeight:500}}>{ing}</span></div>))}</div></div>)}
+            {(r.steps||[]).length>0&&(<div><p style={{fontSize:11,fontWeight:800,color:C.mu,textTransform:"uppercase",letterSpacing:"0.8px",marginBottom:16}}>Method</p><div style={{display:"flex",flexDirection:"column",gap:14}}>{r.steps.map((step,i)=>(<div key={i} style={{display:"flex",gap:14,alignItems:"flex-start"}}><div style={{width:28,height:28,borderRadius:"50%",background:C.g2,color:C.wh,fontSize:12,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{i+1}</div><p style={{fontSize:14,color:C.md,lineHeight:1.7,fontWeight:400,paddingTop:4}}>{step}</p></div>))}</div></div>)}
             <div style={{display:"flex",gap:10,paddingTop:8}}>
               <button onClick={()=>{setEditIdx(mealbank.findIndex(x=>x.id===r.id));setViewRecipe(null);}} style={{flex:1,padding:"13px",borderRadius:12,border:`1.5px solid ${C.brd}`,background:C.wh,color:C.md,fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:7}}>{Icon.edit} Edit</button>
               <button onClick={()=>del(r.id)} style={{padding:"13px 18px",borderRadius:12,border:`1.5px solid ${C.r4}`,background:C.r5,color:C.r2,fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",gap:7}}>{Icon.trash}</button>
@@ -712,30 +772,113 @@ function MainApp({profile,macros,inv,mealbank,setMealbank,weeklyPlan,setWeeklyPl
     if(editIdx!==null){const r=mealbank[editIdx];return(<div style={{padding:"0 20px 32px"}}><div style={{display:"flex",alignItems:"center",gap:12,padding:"16px 0"}}><button onClick={()=>setEditIdx(null)} style={{background:"none",border:"none",color:C.g2,cursor:"pointer",display:"flex"}}>{Icon.chevL}</button><h3 style={{fontFamily:"'Fraunces',serif",fontSize:18,color:C.dk,fontWeight:700}}>Edit recipe</h3></div><div style={{display:"flex",flexDirection:"column",gap:14}}>{[["title","Recipe name"],["time","Cook time"],["desc","Description"]].map(([k,l])=>(<div key={k}><label style={lbl}>{l}</label><input value={r[k]||""} onChange={e=>updateMealBank(p=>p.map((x,i)=>i===editIdx?{...x,[k]:e.target.value}:x))} style={inp}/></div>))}<div><label style={lbl}>Ingredients (one per line)</label><textarea value={(r.ingredients||[]).join("\n")} onChange={e=>updateMealBank(p=>p.map((x,i)=>i===editIdx?{...x,ingredients:e.target.value.split("\n")}:x))} style={{...inp,height:100,resize:"none",fontFamily:"'DM Sans',sans-serif"}}/></div><div><label style={lbl}>Steps (one per line)</label><textarea value={(r.steps||[]).join("\n")} onChange={e=>updateMealBank(p=>p.map((x,i)=>i===editIdx?{...x,steps:e.target.value.split("\n")}:x))} style={{...inp,height:100,resize:"none",fontFamily:"'DM Sans',sans-serif"}}/></div><Btn onClick={()=>setEditIdx(null)} label="Save changes"/></div></div>);}
 
     // ── LIST VIEW ──
-    return(<div style={{padding:"14px 20px 32px",display:"flex",flexDirection:"column",gap:14}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><h3 style={{fontFamily:"'Fraunces',serif",fontSize:20,color:C.dk,fontWeight:700}}>Meal Bank</h3><p style={{fontSize:12,color:C.mu,marginTop:2}}>{mealbank.length} recipes saved</p></div><div style={{display:"flex",gap:8}}><button onClick={genAi} disabled={aiLoading} style={{padding:"8px 12px",borderRadius:20,border:"none",background:C.g6,color:C.g2,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",gap:5}}><span style={{display:"flex"}}>{Icon.refresh}</span>{aiLoading?"Generating...":"AI recipes"}</button><button onClick={()=>setShowAdd(!showAdd)} style={{padding:"8px 14px",borderRadius:20,border:"none",background:C.g2,color:C.wh,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",gap:5}}>{Icon.plus} Save</button></div></div>
-      {showAdd&&(<div style={{padding:"14px",borderRadius:12,background:C.wh,border:`1.5px solid ${C.brd}`,display:"flex",flexDirection:"column",gap:10}}><p style={{fontSize:11,fontWeight:700,color:C.mu,textTransform:"uppercase",letterSpacing:"0.6px"}}>Paste a link from Instagram, TikTok, YouTube, or any recipe site</p><input value={url} onChange={e=>setUrl(e.target.value)} placeholder="https://..." style={inp}/>{parseErr&&<p style={{fontSize:12,color:C.r2,fontWeight:600}}>{parseErr}</p>}{parsing?(<p style={{fontSize:13,color:C.g2,fontWeight:700}}>Extracting recipe...</p>):(<div style={{display:"flex",gap:8}}><Btn onClick={parseUrl} label="Extract recipe" small/><Btn onClick={()=>{setShowAdd(false);setUrl("");setParseErr("");}} label="Cancel" small secondary/></div>)}</div>)}
-      <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4}}>{["all","manual","ai","instagram","tiktok","youtube"].map(f=>(<button key={f} onClick={()=>setFilter(f)} style={{padding:"6px 14px",borderRadius:20,border:`1.5px solid ${filter===f?C.g2:C.brd}`,background:filter===f?C.g6:C.wh,color:filter===f?C.g2:C.mu,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap",textTransform:"capitalize"}}>{f==="all"?"All":f==="ai"?"AI Generated":f}</button>))}</div>
-      {filtered.map((r)=>{const sc=srcCol[r.source]||C.g2;return(
-        <div key={r.id} onClick={()=>setViewRecipe(r)} style={{background:C.wh,borderRadius:13,border:`1.5px solid ${C.brd}`,overflow:"hidden",cursor:"pointer",transition:"transform 0.1s"}}>
-          <div style={{padding:"13px 14px"}}>
-            <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:6}}><span style={{color:sc}}>{srcIcon[r.source]||Icon.chef}</span><Tag label={r.source==="ai"?"AI Generated":r.source||"manual"} color={sc}/></div>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-              <div style={{flex:1}}>
-                <h4 style={{fontSize:14,fontWeight:700,color:C.dk,lineHeight:1.3,marginBottom:3}}>{r.title}</h4>
-                <p style={{fontSize:11,color:C.mu,lineHeight:1.4,marginBottom:8}}>{r.desc}</p>
-                <div style={{display:"flex",gap:10}}>
-                  <span style={{fontSize:11,color:C.mu,display:"flex",alignItems:"center",gap:4}}><span style={{color:C.g3}}>{Icon.clock}</span>{r.time}</span>
-                  <span style={{fontSize:11,color:C.mu}}>{r.cal} kcal</span>
-                  <span style={{fontSize:11,color:C.mu}}>{r.prot}g protein</span>
-                </div>
+    return(
+      <div style={{padding:"14px 20px 32px",display:"flex",flexDirection:"column",gap:14}}>
+        {/* Header row */}
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div>
+            <h3 style={{fontFamily:"'Fraunces',serif",fontSize:20,color:C.dk,fontWeight:700}}>Meal Bank</h3>
+            <p style={{fontSize:12,color:C.mu,marginTop:2}}>{mealbank.length} recipes</p>
+          </div>
+          <button onClick={genAi} disabled={aiLoading} style={{padding:"8px 12px",borderRadius:20,border:"none",background:C.g6,color:C.g2,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",gap:5}}>
+            <span style={{display:"flex"}}>{Icon.refresh}</span>{aiLoading?"...":"AI recipes"}
+          </button>
+        </div>
+
+        {/* Action buttons */}
+        <div style={{display:"flex",gap:8}}>
+          <button onClick={()=>setPanel(panel==="url"?null:"url")} style={{flex:1,padding:"10px",borderRadius:12,border:`1.5px solid ${panel==="url"?C.g2:C.brd}`,background:panel==="url"?C.g6:C.wh,color:panel==="url"?C.g2:C.md,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
+            {Icon.link} Save URL
+          </button>
+          <button onClick={()=>setPanel(panel==="manual"?null:"manual")} style={{flex:1,padding:"10px",borderRadius:12,border:`1.5px solid ${panel==="manual"?C.g2:C.brd}`,background:panel==="manual"?C.g6:C.wh,color:panel==="manual"?C.g2:C.md,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
+            {Icon.plus} Add manually
+          </button>
+        </div>
+
+        {/* Save URL panel */}
+        {panel==="url"&&(
+          <div style={{padding:"14px",borderRadius:12,background:C.wh,border:`1.5px solid ${C.brd}`,display:"flex",flexDirection:"column",gap:10}}>
+            <p style={{fontSize:11,fontWeight:700,color:C.mu,textTransform:"uppercase",letterSpacing:"0.6px"}}>Instagram, TikTok, YouTube, or any recipe page</p>
+            <input value={url} onChange={e=>setUrl(e.target.value)} onKeyDown={e=>e.key==="Enter"&&parseUrl()} placeholder="https://..." style={inp}/>
+            {parseErr&&<p style={{fontSize:12,color:C.r2,fontWeight:600}}>{parseErr}</p>}
+            {parsing?(<p style={{fontSize:13,color:C.g2,fontWeight:700}}>Extracting recipe...</p>):(
+              <div style={{display:"flex",gap:8}}>
+                <Btn onClick={parseUrl} label="Extract recipe" small/>
+                <Btn onClick={()=>{setPanel(null);setUrl("");setParseErr("");}} label="Cancel" small secondary/>
               </div>
-              <div style={{color:C.lt,marginLeft:10,marginTop:2,flexShrink:0}}>{Icon.chevR}</div>
+            )}
+          </div>
+        )}
+
+        {/* Add Manually panel */}
+        {panel==="manual"&&(
+          <div style={{padding:"14px",borderRadius:12,background:C.wh,border:`1.5px solid ${C.brd}`,display:"flex",flexDirection:"column",gap:12}}>
+            <p style={{fontSize:11,fontWeight:700,color:C.mu,textTransform:"uppercase",letterSpacing:"0.6px"}}>New recipe — saved to My Recipes</p>
+            <div><label style={lbl}>Recipe name *</label><input value={mf.title} onChange={e=>setMf(m=>({...m,title:e.target.value}))} placeholder="e.g. Mum's Daal" style={inp}/></div>
+            <div style={{display:"flex",gap:8}}>
+              <div style={{flex:1}}>
+                <label style={lbl}>Meal type</label>
+                <select value={mf.mealType} onChange={e=>setMf(m=>({...m,mealType:e.target.value}))} style={{...inp,cursor:"pointer"}}>
+                  {["breakfast","lunch","dinner","snack"].map(t=><option key={t} value={t} style={{textTransform:"capitalize"}}>{t.charAt(0).toUpperCase()+t.slice(1)}</option>)}
+                </select>
+              </div>
+              <div style={{flex:1}}><label style={lbl}>Cook time</label><input value={mf.time} onChange={e=>setMf(m=>({...m,time:e.target.value}))} placeholder="30 min" style={inp}/></div>
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <div style={{flex:1}}><label style={lbl}>Calories (kcal)</label><input type="number" value={mf.cal} onChange={e=>setMf(m=>({...m,cal:e.target.value}))} placeholder="450" style={inp}/></div>
+              <div style={{flex:1}}><label style={lbl}>Protein (g)</label><input type="number" value={mf.prot} onChange={e=>setMf(m=>({...m,prot:e.target.value}))} placeholder="35" style={inp}/></div>
+            </div>
+            <div><label style={lbl}>Ingredients (one per line)</label><textarea value={mf.ingredients} onChange={e=>setMf(m=>({...m,ingredients:e.target.value}))} placeholder={"2 cups basmati rice\n400g chicken breast, cubed\n1 tsp cumin"} style={{...inp,height:90,resize:"none",fontFamily:"'DM Sans',sans-serif"}}/></div>
+            <div><label style={lbl}>Steps (one per line)</label><textarea value={mf.steps} onChange={e=>setMf(m=>({...m,steps:e.target.value}))} placeholder={"Season chicken with spices.\nFry onions until golden.\nAdd chicken and cook through."} style={{...inp,height:90,resize:"none",fontFamily:"'DM Sans',sans-serif"}}/></div>
+            <div style={{display:"flex",gap:8}}>
+              <Btn onClick={saveManual} disabled={!mf.title.trim()} label="Save to My Recipes" small/>
+              <Btn onClick={()=>setPanel(null)} label="Cancel" small secondary/>
             </div>
           </div>
+        )}
+
+        {/* Tabs */}
+        <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4}}>
+          {[{k:"all",l:"All"},{k:"ai",l:"AI Picks"},{k:"mine",l:"My Recipes"},{k:"saved",l:"Saved"}].map(f=>(
+            <button key={f.k} onClick={()=>setFilter(f.k)} style={{padding:"6px 14px",borderRadius:20,border:`1.5px solid ${filter===f.k?C.g2:C.brd}`,background:filter===f.k?C.g6:C.wh,color:filter===f.k?C.g2:C.mu,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap"}}>{f.l}</button>
+          ))}
         </div>
-      );})}
-    </div>);
+
+        {/* Recipe cards */}
+        {filtered.length===0&&(
+          <div style={{padding:"28px",textAlign:"center",background:C.wh,borderRadius:14,border:`1.5px solid ${C.brd}`}}>
+            <p style={{fontSize:14,color:C.mu,fontWeight:600}}>
+              {filter==="mine"?"Add recipes manually or complete onboarding to populate this tab.":
+               filter==="saved"?"Save recipes from Instagram, TikTok, YouTube, or any recipe site using the Save URL button.":
+               filter==="ai"?"Tap AI Recipes above to generate suggestions.":
+               "No recipes yet — generate some or add your own."}
+            </p>
+          </div>
+        )}
+        {filtered.map((r)=>{const sc=srcCol[r.source]||C.g2;return(
+          <div key={r.id} onClick={()=>setViewRecipe(r)} style={{background:C.wh,borderRadius:13,border:`1.5px solid ${C.brd}`,overflow:"hidden",cursor:"pointer"}}>
+            <div style={{padding:"13px 14px"}}>
+              <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:6}}>
+                <span style={{color:sc}}>{srcIcon[r.source]||Icon.chef}</span>
+                <Tag label={srcLabel(r.source)} color={sc}/>
+              </div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                <div style={{flex:1}}>
+                  <h4 style={{fontSize:14,fontWeight:700,color:C.dk,lineHeight:1.3,marginBottom:3}}>{r.title}</h4>
+                  <p style={{fontSize:11,color:C.mu,lineHeight:1.4,marginBottom:8}}>{r.desc}</p>
+                  <div style={{display:"flex",gap:10}}>
+                    <span style={{fontSize:11,color:C.mu,display:"flex",alignItems:"center",gap:4}}><span style={{color:C.g3}}>{Icon.clock}</span>{r.time}</span>
+                    {r.cal>0&&<span style={{fontSize:11,color:C.mu}}>{r.cal} kcal</span>}
+                    {r.prot>0&&<span style={{fontSize:11,color:C.mu}}>{r.prot}g protein</span>}
+                  </div>
+                </div>
+                <div style={{color:C.lt,marginLeft:10,marginTop:2,flexShrink:0}}>{Icon.chevR}</div>
+              </div>
+            </div>
+          </div>
+        );})}
+      </div>
+    );
   }
 
   function KitchenTab(){
@@ -776,6 +919,103 @@ function MainApp({profile,macros,inv,mealbank,setMealbank,weeklyPlan,setWeeklyPl
   </div>);
 }
 
+// ─── OB_RECEIPTS ─────────────────────────────────────────────────────────────
+function OB_Receipts({inv,sinv,go}){
+  const[phase,setPhase]=useState("idle");
+  const[items,setItems]=useState([]);
+  const[parsing,setParsing]=useState(false);
+  const[parseErr,setParseErr]=useState("");
+  const fileRef=useRef(null);
+
+  const handleFile=async(e)=>{
+    const file=e.target.files?.[0];
+    if(!file)return;
+    setParsing(true);setParseErr("");setPhase("parsing");
+    try{
+      const reader=new FileReader();
+      reader.onload=async(ev)=>{
+        const base64=ev.target.result.split(",")[1];
+        const mediaType=file.type||"image/jpeg";
+        try{
+          const r=await fetch("/api/parse-grocery-receipt",{method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({imageBase64:base64,mediaType})});
+          const d=await r.json();
+          if(d.items&&d.items.length>0){
+            const newItems=d.items.map((it,i)=>({id:Date.now()+i,name:it.name,cat:it.cat||"Other",qty:it.qty||"1 unit",d:it.d||14}));
+            const merged=[...inv,...newItems.filter(n=>!inv.find(e=>e.name.toLowerCase()===n.name.toLowerCase()))];
+            setItems(newItems);sinv(merged);setPhase("done");
+          }else{
+            setParseErr("No grocery items found. Try a clearer photo of the receipt.");setPhase("idle");
+          }
+        }catch{setParseErr("Could not read this receipt. Try again with a clearer photo.");setPhase("idle");}
+        finally{setParsing(false);}
+      };
+      reader.readAsDataURL(file);
+    }catch{setParsing(false);setPhase("idle");}
+  };
+
+  return(
+    <Screen>
+      <Dots n={14} cur={13}/>
+      <Hdr icon={Icon.photo} title="Import your grocery receipts." sub="Upload photos of receipts from your last few shops. We'll add detected items to your inventory automatically."/>
+      <OBScroll>
+        <div style={{display:"flex",flexDirection:"column",gap:12,paddingTop:8}}>
+          <input ref={fileRef} type="file" accept="image/*,application/pdf" onChange={handleFile} style={{display:"none"}}/>
+          {phase==="idle"&&(
+            <>
+              <div onClick={()=>fileRef.current?.click()} style={{border:`1.5px dashed ${C.brd}`,borderRadius:14,padding:"28px 20px",display:"flex",flexDirection:"column",alignItems:"center",gap:10,background:C.wh,cursor:"pointer"}}>
+                <div style={{color:C.g3}}>{Icon.photo}</div>
+                <p style={{fontSize:14,fontWeight:700,color:C.dk}}>Upload a receipt</p>
+                <p style={{fontSize:12,color:C.mu,textAlign:"center",lineHeight:1.6}}>
+                  Photo from your camera roll, screenshot, or PDF.<br/>
+                  Works with grocery, supermarket, or delivery receipts.
+                </p>
+                <span style={{padding:"9px 20px",borderRadius:20,background:C.g2,color:C.wh,fontSize:13,fontWeight:700}}>Choose file</span>
+              </div>
+              {parseErr&&(<div style={{padding:"12px 14px",borderRadius:10,background:C.r5,border:`1px solid ${C.r4}`}}><p style={{fontSize:12,color:C.r1,fontWeight:700}}>{parseErr}</p></div>)}
+              <div style={{padding:"12px 14px",borderRadius:11,background:C.g6,border:`1px solid ${C.g5}`}}>
+                <p style={{fontSize:12,color:C.g1,lineHeight:1.6}}>You can upload multiple receipts — tap Choose file again after each one. All detected items are added to your inventory.</p>
+              </div>
+            </>
+          )}
+          {phase==="parsing"&&(
+            <div style={{padding:"32px 24px",borderRadius:14,background:C.g6,border:`1.5px solid ${C.g5}`,textAlign:"center"}}>
+              <div style={{color:C.g3,marginBottom:12,display:"inline-block",animation:"spin 1.2s linear infinite"}}>{Icon.refresh}</div>
+              <p style={{fontSize:14,fontWeight:700,color:C.g1}}>Reading receipt...</p>
+              <p style={{fontSize:12,color:C.g3,marginTop:4}}>Identifying grocery items and quantities</p>
+            </div>
+          )}
+          {phase==="done"&&items.length>0&&(
+            <>
+              <div style={{padding:"12px 14px",borderRadius:10,background:C.g6,border:`1px solid ${C.g5}`}}>
+                <p style={{fontSize:13,color:C.g1,fontWeight:700}}>{items.length} items added to your inventory</p>
+              </div>
+              <div style={{display:"flex",flexDirection:"column",gap:7}}>
+                {items.slice(0,8).map(item=>{const col=item.d<=3?C.r2:item.d<=7?C.o2:C.g2;return(
+                  <div key={item.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 12px",borderRadius:10,background:C.wh,borderLeft:`3px solid ${col}`}}>
+                    <div><p style={{fontSize:13,fontWeight:700,color:C.dk}}>{item.name}</p><p style={{fontSize:11,color:C.mu}}>{item.cat} · {item.qty}</p></div>
+                    <span style={{fontSize:11,color:col,fontWeight:700}}>{item.d<=7?`${item.d}d`:item.qty}</span>
+                  </div>
+                );})}
+                {items.length>8&&<p style={{fontSize:12,color:C.mu,textAlign:"center"}}>+{items.length-8} more items added</p>}
+              </div>
+              <button onClick={()=>{setPhase("idle");setItems([]);}} style={{padding:"11px",borderRadius:12,border:`1.5px solid ${C.brd}`,background:C.wh,color:C.md,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>
+                Upload another receipt
+              </button>
+            </>
+          )}
+        </div>
+      </OBScroll>
+      <OBBtn>
+        <Btn onClick={go} disabled={parsing}
+          label={items.length>0?`${inv.length} inventory items — finish setup →`:"Skip — finish setup →"}/>
+      </OBBtn>
+      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
+    </Screen>
+  );
+}
+
 // ─── ROOT ─────────────────────────────────────────────────────────────────────
 export default function App(){
   useEffect(()=>{
@@ -794,12 +1034,23 @@ export default function App(){
   const[allergens,setAllergens]=useState([]);
   const[cuisines,setCuisines]=useState([]);
   const[meals,setMeals]=useState({breakfast:[],lunch:[],dinner:[]});
+  const[recentMeals,setRecentMeals]=useState([]);
   const[dislikes,setDislikes]=useState([]);
   const[inventory,setInventory]=useState([]);
   const[mealbank,setMealbank]=useState(MB_SEED);
   const[weeklyPlan,setWeeklyPlan]=useState({});
   const[authed,setAuthed]=useState(false);
   const[loadingAuth,setLoadingAuth]=useState(true);
+  const[generating,setGenerating]=useState(false);
+  const[genStep,setGenStep]=useState(0);
+
+  const GEN_MESSAGES=[
+    "Learning your preferences...",
+    "Building recipes from your meals...",
+    "Generating AI suggestions...",
+    "Adding more variety...",
+    "Almost ready...",
+  ];
 
   useEffect(()=>{
     // ── Step 1: Check localStorage first (works even without Supabase) ──
@@ -855,15 +1106,62 @@ export default function App(){
   const finishOnboarding=async()=>{
     const finalProfile={...profile,goals:profile.goals,mealtimes:profile.mealtimes,cookDays:profile.cookDays,cuisines,allergens,dislikes,health,macros};
     setProfile(finalProfile);
-    // Save to localStorage — this is what makes the app remember you
-    localStorage.setItem('savorly_onboarded','true');
+    setGenerating(true);setGenStep(0);
+
+    // Save profile + inventory immediately
     localStorage.setItem('savorly_profile',JSON.stringify(finalProfile));
     localStorage.setItem('savorly_inventory',JSON.stringify(inventory));
-    localStorage.setItem('savorly_mealbank',JSON.stringify(mealbank));
-    // Save to Supabase if available (syncs across devices)
     await saveProfile(finalProfile);
     await saveInventory(inventory);
-    await saveMealBank(mealbank);
+
+    let allRecipes=[];
+    const apiBase={cuisines,allergens,dislikes,goals:finalProfile.goals,macros,inventory};
+
+    // Batch 1 — full recipes for the user's own stated meals
+    const userMealNames=[
+      ...recentMeals,
+      ...meals.breakfast,...meals.lunch,...meals.dinner,
+    ].filter(Boolean).slice(0,10);
+
+    if(userMealNames.length>0){
+      setGenStep(1);
+      try{
+        const r=await fetch('/api/generate-month',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({...apiBase,type:'user_recipes',mealNames:userMealNames})});
+        const d=await r.json();
+        if(d.recipes)allRecipes=[...allRecipes,...d.recipes.map((r,i)=>({...r,id:Date.now()+i,source:'onboarding-manual'}))];
+      }catch(e){console.error('Batch 1 failed',e);}
+    }
+
+    // Batch 2 — AI suggestions set 1
+    setGenStep(2);
+    try{
+      const r=await fetch('/api/generate-month',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({...apiBase,type:'ai_suggestions',batchSeed:Math.random().toString(36).slice(2,8),
+          existingTitles:allRecipes.map(r=>r.title)})});
+      const d=await r.json();
+      if(d.recipes)allRecipes=[...allRecipes,...d.recipes.map((r,i)=>({...r,id:Date.now()+1000+i,source:'onboarding-ai'}))];
+    }catch(e){console.error('Batch 2 failed',e);}
+
+    // Batch 3 — AI suggestions set 2 for more variety
+    setGenStep(3);
+    try{
+      const r=await fetch('/api/generate-month',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({...apiBase,type:'ai_suggestions',batchSeed:Math.random().toString(36).slice(2,8),
+          existingTitles:allRecipes.map(r=>r.title)})});
+      const d=await r.json();
+      if(d.recipes)allRecipes=[...allRecipes,...d.recipes.map((r,i)=>({...r,id:Date.now()+2000+i,source:'onboarding-ai'}))];
+    }catch(e){console.error('Batch 3 failed',e);}
+
+    setGenStep(4);
+    // Fall back to seed recipes if generation totally failed
+    const finalMB=allRecipes.length>0?allRecipes:MB_SEED;
+    setMealbank(finalMB);
+    localStorage.setItem('savorly_onboarded','true');
+    localStorage.setItem('savorly_mealbank',JSON.stringify(finalMB));
+    await saveMealBank(finalMB);
+
+    setGenerating(false);
     setStep(99);
   };
 
@@ -881,6 +1179,26 @@ export default function App(){
 
   if(loadingAuth)return(<div style={{height:"100dvh",background:C.g2,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'DM Sans',sans-serif"}}><p style={{color:"rgba(255,255,255,0.6)",fontSize:14}}>Loading...</p></div>);
 
+  if(generating)return(
+    <div style={{height:"100dvh",background:C.g2,display:"flex",flexDirection:"column",alignItems:"center",
+      justifyContent:"center",padding:"40px 32px",textAlign:"center",fontFamily:"'DM Sans',sans-serif",
+      maxWidth:430,margin:"0 auto"}}>
+      <div style={{color:"rgba(255,255,255,0.7)",marginBottom:24,animation:"spin 1.4s linear infinite",display:"inline-block"}}>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+      </div>
+      <h2 style={{fontFamily:"'Fraunces',serif",fontSize:28,color:C.wh,fontWeight:700,marginBottom:10}}>Building your kitchen...</h2>
+      <p style={{color:"rgba(255,255,255,0.65)",fontSize:15,marginBottom:32,lineHeight:1.6}}>{GEN_MESSAGES[genStep]||GEN_MESSAGES[0]}</p>
+      <div style={{width:"100%",maxWidth:280,height:6,borderRadius:3,background:"rgba(255,255,255,0.15)"}}>
+        <div style={{height:"100%",borderRadius:3,background:"rgba(255,255,255,0.8)",width:`${Math.min(100,((genStep+1)/GEN_MESSAGES.length)*100)}%`,transition:"width 0.6s ease"}}/>
+      </div>
+      <div style={{display:"flex",gap:16,marginTop:32}}>
+        {GEN_MESSAGES.map((_,i)=>(<div key={i} style={{width:8,height:8,borderRadius:"50%",background:i<=genStep?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.2)",transition:"all 0.3s"}}/>))}
+      </div>
+      <p style={{color:"rgba(255,255,255,0.35)",fontSize:11,marginTop:32,lineHeight:1.6}}>Generating full recipes from your meals.<br/>This takes about 30 seconds.</p>
+      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
+    </div>
+  );
+
   if(!authed&&step===0)return(<Welcome go={next}/>);
   if(!authed&&step===1)return <OB_Name p={profile} sp={setProfile} go={next}/>;
   if(!authed&&step===2)return <OB_Body p={profile} sp={setProfile} go={next}/>;
@@ -891,8 +1209,11 @@ export default function App(){
   if(!authed&&step===7)return <OB_Subs al={allergens} go={next}/>;
   if(!authed&&step===8)return <OB_Cuisines cu={cuisines} scu={setCuisines} go={next}/>;
   if(!authed&&step===9)return <OB_Faves meals={meals} setMeals={setMeals} go={next}/>;
-  if(!authed&&step===10)return <OB_Confess dis={dislikes} sdis={setDislikes} go={next}/>;
-  if(!authed&&step===11)return <OB_Inventory inv={inventory} sinv={setInventory} go={finishOnboarding}/>;
+  if(!authed&&step===10)return <OB_RecentMeals recent={recentMeals} setRecent={setRecentMeals} go={next}/>;
+  if(!authed&&step===11)return <OB_Confess dis={dislikes} sdis={setDislikes} go={next}/>;
+  if(!authed&&step===12)return <OB_Inventory inv={inventory} sinv={setInventory} go={next}/>;
+  if(!authed&&step===13)return <OB_Receipts inv={inventory} sinv={setInventory} go={finishOnboarding}/>;
 
   return(<MainApp profile={profile} macros={macros} inv={inventory.length?inventory:INV_SEED} mealbank={mealbank} setMealbank={setMealbank} weeklyPlan={weeklyPlan} setWeeklyPlan={setWeeklyPlan} onSignOut={handleSignOut}/>);
 }
+
