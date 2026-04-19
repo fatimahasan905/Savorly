@@ -48,7 +48,18 @@ const Icon = {
 const inp = {width:"100%",padding:"12px 15px",borderRadius:10,border:`1.5px solid ${C.brd}`,fontSize:14,fontFamily:"'DM Sans',sans-serif",outline:"none",background:C.wh,color:C.dk};
 const lbl = {fontSize:11,fontWeight:700,color:C.mu,display:"block",marginBottom:7,textTransform:"uppercase",letterSpacing:"0.8px"};
 
-function Screen({children,bg}){return(<div style={{minHeight:"100vh",background:bg||C.bg,display:"flex",flexDirection:"column",fontFamily:"'DM Sans',sans-serif",maxWidth:430,margin:"0 auto",overflowX:"hidden"}}>{children}</div>);}
+// Onboarding screen — uses dynamic viewport height so button never gets cut off on mobile
+function Screen({children,bg}){return(<div style={{height:"100dvh",background:bg||C.bg,display:"flex",flexDirection:"column",fontFamily:"'DM Sans',sans-serif",maxWidth:430,margin:"0 auto",overflowX:"hidden",overflowY:"hidden"}}>{children}</div>);}
+
+// Meal type icons — used in daily/weekly plan
+const MealIcon={
+  breakfast:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>,
+  lunch:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>,
+  snack:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>,
+  dinner:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>,
+  second_snack:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>,
+  supper:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>,
+};
 function Dots({n,cur}){return(<div style={{display:"flex",gap:5,justifyContent:"center",paddingTop:16}}>{Array.from({length:n}).map((_,i)=>(<div key={i} style={{width:i===cur?22:7,height:7,borderRadius:4,background:i<cur?C.g4:i===cur?C.g2:C.brd,transition:"all 0.3s"}}/>))}</div>);}
 function Pill({label,on,toggle,color,bg}){const ac=color||C.g2,abc=bg||C.g6;return(<button onClick={toggle} style={{padding:"8px 14px",borderRadius:20,border:`1.5px solid ${on?ac:C.brd}`,background:on?abc:C.wh,color:on?ac:C.mu,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all 0.15s"}}>{label}</button>);}
 function Tag({label,color}){const c=color||C.g2;return(<span style={{padding:"3px 9px",borderRadius:20,background:c+"22",color:c,fontSize:11,fontWeight:700,flexShrink:0}}>{label}</span>);}
@@ -113,7 +124,7 @@ function AuthScreen({onComplete}){
 // ─── ONBOARDING ───────────────────────────────────────────────────────────────
 function Welcome({go}){return(<div style={{minHeight:"100vh",background:C.g2,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"52px 32px",textAlign:"center",fontFamily:"'DM Sans',sans-serif",maxWidth:430,margin:"0 auto"}}><div style={{width:60,height:60,borderRadius:18,background:"rgba(255,255,255,0.12)",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:26,color:"rgba(255,255,255,0.9)"}}><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M12 2a9 9 0 00-9 9c0 6 9 13 9 13s9-7 9-13a9 9 0 00-9-9z"/><circle cx="12" cy="10" r="3"/></svg></div><h1 style={{fontFamily:"'Fraunces',serif",fontSize:44,color:C.wh,marginBottom:8,lineHeight:1.05,fontWeight:700}}>Savorly</h1><p style={{color:"rgba(255,255,255,0.65)",fontSize:15,marginBottom:8,lineHeight:1.6}}>Your personal kitchen intelligence.</p><p style={{color:"rgba(255,255,255,0.4)",fontSize:13,marginBottom:52,lineHeight:1.7}}>Recipes built from what you have.<br/>Macros calibrated to your body.<br/>Zero waste. Zero guesswork.</p><button onClick={go} style={{width:"100%",maxWidth:280,padding:"16px",borderRadius:14,border:"none",background:C.wh,color:C.g2,fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>Get started →</button><p style={{color:"rgba(255,255,255,0.25)",fontSize:11,marginTop:18}}>3-minute setup · All data saved to your account</p></div>);}
 
-function OB_Name({p,sp,go}){return(<Screen><Dots n={12} cur={0}/><Hdr icon={Icon.user} title="Nice to meet you." sub="Your name and biological sex — for macro calculations only."/><div style={{padding:"8px 24px 32px",flex:1,display:"flex",flexDirection:"column",gap:18}}><div><label style={lbl}>First name</label><input value={p.name} onChange={e=>sp({...p,name:e.target.value})} placeholder="What do we call you?" style={inp}/></div><div><label style={lbl}>Biological sex</label><div style={{display:"flex",gap:10}}>{["Male","Female"].map(s=>(<button key={s} onClick={()=>sp({...p,sex:s.toLowerCase()})} style={{flex:1,padding:"14px",borderRadius:12,cursor:"pointer",border:`1.5px solid ${p.sex===s.toLowerCase()?C.g2:C.brd}`,background:p.sex===s.toLowerCase()?C.g6:C.wh,fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:14,color:p.sex===s.toLowerCase()?C.g2:C.md}}>{s}</button>))}</div></div><div style={{marginTop:"auto"}}><Btn onClick={go} disabled={!p.name||!p.sex}/></div></div></Screen>);}
+function OB_Name({p,sp,go}){return(<Screen><Dots n={12} cur={0}/><Hdr icon={Icon.user} title="Nice to meet you." sub="Your name and biological sex — for macro calculations only."/><div style={{flex:1,overflowY:"auto",padding:"8px 24px 0",display:"flex",flexDirection:"column",gap:18}}><div><label style={lbl}>First name</label><input value={p.name} onChange={e=>sp({...p,name:e.target.value})} placeholder="What do we call you?" style={inp}/></div><div><label style={lbl}>Biological sex</label><div style={{display:"flex",gap:10}}>{["Male","Female"].map(s=>(<button key={s} onClick={()=>sp({...p,sex:s.toLowerCase()})} style={{flex:1,padding:"14px",borderRadius:12,cursor:"pointer",border:`1.5px solid ${p.sex===s.toLowerCase()?C.g2:C.brd}`,background:p.sex===s.toLowerCase()?C.g6:C.wh,fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:14,color:p.sex===s.toLowerCase()?C.g2:C.md}}>{s}</button>))}</div></div></div><div style={{padding:"16px 24px 32px",flexShrink:0}}><Btn onClick={go} disabled={!p.name||!p.sex}/></div></Screen>);}
 
 function OB_Body({p,sp,go}){const tog=k=>sp(prev=>{const gs=prev.goals||[];return{...prev,goals:gs.includes(k)?gs.filter(x=>x!==k):[...gs,k]};});return(<Screen><Dots n={12} cur={1}/><Hdr icon={Icon.settings} title={`Alright, ${p.name||"friend"}.`} sub="Body stats for macro targets. Then every goal you're working toward — select all that apply."/><div style={{padding:"8px 24px 32px",flex:1,display:"flex",flexDirection:"column",gap:14}}><div style={{display:"flex",gap:10}}>{[["age","Age","28"],["weight","Weight kg","65"],["height","Height cm","165"]].map(([k,l,ph])=>(<div key={k} style={{flex:1}}><label style={lbl}>{l}</label><input type="number" value={p[k]||""} onChange={e=>sp({...p,[k]:e.target.value})} placeholder={ph} style={{...inp,padding:"12px 10px"}}/></div>))}</div><div><label style={{...lbl,marginBottom:12}}>Goals (select all that apply)</label><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>{GOALS.map(g=>{const on=(p.goals||[]).includes(g.k);return(<button key={g.k} onClick={()=>tog(g.k)} style={{padding:"12px",borderRadius:12,textAlign:"left",cursor:"pointer",border:`1.5px solid ${on?C.g2:C.brd}`,background:on?C.g6:C.wh,fontFamily:"'DM Sans',sans-serif"}}><div style={{fontSize:13,fontWeight:700,color:on?C.g2:C.dk}}>{g.l}</div><div style={{fontSize:11,color:C.mu,marginTop:2}}>{g.d}</div></button>);})}</div></div><div style={{marginTop:"auto"}}><Btn onClick={go} disabled={!p.age||!p.weight||!p.height||!(p.goals||[]).length}/></div></div></Screen>);}
 
@@ -193,9 +204,104 @@ function MainApp({profile,macros,inv,mealbank,setMealbank,weeklyPlan,setWeeklyPl
     </div>);
   }
 
+  // ── MEAL PLANNING RULES ENGINE ──────────────────────────────────────────────
+  // Rule 1: Daily calories must be within ±50 of target
+  // Rule 2: Daily protein must be ≥ target and ≤ target + 5g
+  // Rule 3: Dinners rotate through chicken / beef / fish / vegetables each week
+  // Rule 4: No recipe repeats more than 2× in a week or 2× in a month
+
+  const DINNER_ROTATION = ["chicken","beef","fish","vegetables"];
+  const getDinnerProteinType = (title="") => {
+    const t = title.toLowerCase();
+    if(t.includes("chicken")||t.includes("poultry")||t.includes("turkey")) return "chicken";
+    if(t.includes("beef")||t.includes("steak")||t.includes("lamb")||t.includes("pork")||t.includes("mince")) return "beef";
+    if(t.includes("salmon")||t.includes("fish")||t.includes("tuna")||t.includes("cod")||t.includes("shrimp")||t.includes("prawn")||t.includes("seafood")) return "fish";
+    return "vegetables";
+  };
+
+  const validateDay = (dayRecipes) => {
+    const allRecs = dayRecipes.filter(Boolean);
+    const totCal = allRecs.reduce((s,r)=>s+(r?.cal||0),0);
+    const totProt = allRecs.reduce((s,r)=>s+(r?.prot||0),0);
+    const calOk = totCal===0 || (totCal >= macros.calories-50 && totCal <= macros.calories+50);
+    const protOk = totProt===0 || (totProt >= macros.protein && totProt <= macros.protein+5);
+    return { calOk, protOk, totCal, totProt };
+  };
+
+  const validateWeekRepeat = (plan) => {
+    // Count recipe usage across the week
+    const counts = {};
+    DAYS.forEach(d=>{
+      Object.values(plan[d]||{}).forEach(entry=>{
+        if(entry?.recipe?.id){
+          counts[entry.recipe.id]=(counts[entry.recipe.id]||0)+1;
+        }
+      });
+    });
+    return counts; // id -> count, flag any > 2
+  };
+
+  const validateDinnerRotation = (plan) => {
+    // Check dinners across the week have variety
+    const dinnerTypes = DAYS.map(d=>{
+      const dinnerSlot = Object.entries(plan[d]||{}).find(([s])=>s.includes("dinner"));
+      return dinnerSlot?.[1]?.recipe ? getDinnerProteinType(dinnerSlot[1].recipe.title) : null;
+    }).filter(Boolean);
+    const counts = {};
+    dinnerTypes.forEach(t=>counts[t]=(counts[t]||0)+1);
+    return counts; // type -> count, ideal is ≤2 of same type in a week
+  };
+
+  // Smart Fill: auto-assign recipes following all rules
+  const smartFillWeek = (currentPlan) => {
+    const mealSlotsForUser=(mealtimes||["Breakfast","Lunch","Dinner"]).map(m=>m.toLowerCase().replace(/ /g,"_"));
+    const newPlan = JSON.parse(JSON.stringify(currentPlan));
+    const weekUsage = {}; // recipeId -> count this week
+    const dinnerTypeUsage = {}; // type -> count this week
+
+    DAYS.forEach((day,dayIdx)=>{
+      const daySlots = mealSlotsForUser;
+      const assignedIds = [];
+
+      daySlots.forEach(slot=>{
+        const mealType = slot.includes("breakfast")?"breakfast":slot.includes("lunch")?"lunch":slot.includes("dinner")?"dinner":"snack";
+        const isDinner = slot.includes("dinner");
+
+        // Find best recipe for this slot
+        const candidates = mealbank
+          .filter(r=>r.mealType===mealType)
+          .filter(r=>(weekUsage[r.id]||0)<2) // not used 2x this week
+          .filter(r=>!assignedIds.includes(r.id)); // not already used today
+
+        let chosen = null;
+
+        if(isDinner && candidates.length>0){
+          // Try to use the rotation type for this day
+          const targetType = DINNER_ROTATION[dayIdx % DINNER_ROTATION.length];
+          const rotationMatch = candidates.filter(r=>getDinnerProteinType(r.title)===targetType);
+          // Prefer rotation match, but also prefer types not overused this week
+          const notOverused = candidates.filter(r=>(dinnerTypeUsage[getDinnerProteinType(r.title)]||0)<2);
+          chosen = rotationMatch[0] || notOverused[0] || candidates[0];
+        } else {
+          chosen = candidates[0] || mealbank.find(r=>r.mealType===mealType);
+        }
+
+        if(chosen){
+          newPlan[day] = newPlan[day]||{};
+          newPlan[day][slot] = {...(newPlan[day][slot]||{}), recipe:chosen, rating:null, confirmed:null};
+          weekUsage[chosen.id] = (weekUsage[chosen.id]||0)+1;
+          assignedIds.push(chosen.id);
+          if(isDinner) dinnerTypeUsage[getDinnerProteinType(chosen.title)] = (dinnerTypeUsage[getDinnerProteinType(chosen.title)]||0)+1;
+        }
+      });
+    });
+    return newPlan;
+  };
+
   function WeeklyPlanTab(){
     const mealSlotsForUser=(mealtimes||["Breakfast","Lunch","Dinner"]).map(m=>m.toLowerCase().replace(/ /g,"_"));
     const mealLabel={breakfast:"Breakfast",lunch:"Lunch",snack:"Snack",dinner:"Dinner",second_snack:"Snack 2",supper:"Supper"};
+    const mealIcon=(slot)=>MealIcon[slot]||MealIcon[slot.split("_")[0]]||null;
     const[plan,setPlanLocal]=useState(()=>{
       if(weeklyPlan&&Object.keys(weeklyPlan).length)return weeklyPlan;
       const p={};DAYS.forEach(d=>{p[d]={};mealSlotsForUser.forEach(s=>{const mt=s.includes("breakfast")?"breakfast":s.includes("lunch")?"lunch":s.includes("dinner")?"dinner":"snack";p[d][s]={recipe:mealbank.find(r=>r.mealType===mt)||null,rating:null,confirmed:null};});});return p;
@@ -205,49 +311,313 @@ function MainApp({profile,macros,inv,mealbank,setMealbank,weeklyPlan,setWeeklyPl
     const setRating=(d,s,r)=>setLocal(p=>({...p,[d]:{...p[d],[s]:{...p[d][s],rating:r}}}));
     const setConf=(d,s,v)=>setLocal(p=>({...p,[d]:{...p[d],[s]:{...p[d][s],confirmed:v}}}));
     const assign=(d,s,rec)=>{setLocal(p=>({...p,[d]:{...p[d],[s]:{...p[d][s],recipe:rec}}}));setAdding(null);};
-    if(adding)return(<div style={{padding:"0 20px 32px"}}><div style={{display:"flex",alignItems:"center",gap:12,padding:"16px 0"}}><button onClick={()=>setAdding(null)} style={{background:"none",border:"none",color:C.g2,cursor:"pointer",display:"flex"}}>{Icon.chevL}</button><h3 style={{fontFamily:"'Fraunces',serif",fontSize:18,color:C.dk,fontWeight:700}}>Pick from Meal Bank</h3></div><div style={{display:"flex",flexDirection:"column",gap:10}}>{mealbank.map(r=>(<div key={r.id} onClick={()=>assign(adding.day,adding.slot,r)} style={{padding:"13px 14px",borderRadius:12,background:C.wh,cursor:"pointer",border:`1.5px solid ${C.brd}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><p style={{fontSize:14,fontWeight:700,color:C.dk}}>{r.title}</p><p style={{fontSize:11,color:C.mu,marginTop:2}}>{r.time} · {r.cal} kcal</p></div><div style={{color:C.lt}}>{Icon.chevR}</div></div>))}</div></div>);
-    return(<div style={{padding:"14px 20px 32px",display:"flex",flexDirection:"column",gap:14}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><h3 style={{fontFamily:"'Fraunces',serif",fontSize:20,color:C.dk,fontWeight:700}}>Weekly Plan</h3><p style={{fontSize:12,color:C.mu,marginTop:2}}>Rate meals · confirm what you cooked</p></div>{cookDays?.length>0&&<Tag label={`Cook: ${cookDays.map(d=>d.slice(0,3)).join(", ")}`}/>}</div>
-      {DAYS.map(day=>(<div key={day} style={{background:C.wh,borderRadius:14,overflow:"hidden",border:`1.5px solid ${C.brd}`}}>
-        <div style={{padding:"9px 14px",background:C.bg2,borderBottom:`1px solid ${C.brd}`}}><p style={{fontSize:11,fontWeight:800,color:C.md,textTransform:"uppercase",letterSpacing:"0.7px"}}>{day}</p></div>
-        {mealSlotsForUser.map((slot,si)=>{const entry=plan[day]?.[slot];const rec=entry?.recipe;const conf=entry?.confirmed;const rat=entry?.rating;return(<div key={slot} style={{padding:"10px 14px",borderBottom:si<mealSlotsForUser.length-1?`1px solid ${C.bg3}`:"none",background:conf===true?C.g6:conf===false?C.r5:"transparent"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}><div style={{flex:1}}><p style={{fontSize:10,fontWeight:700,color:C.mu,textTransform:"uppercase",letterSpacing:"0.6px",marginBottom:3}}>{mealLabel[slot]||slot}</p>{rec?(<p style={{fontSize:13,fontWeight:700,color:C.dk,lineHeight:1.3}}>{rec.title}</p>):(<button onClick={()=>setAdding({day,slot})} style={{fontSize:12,color:C.g2,fontWeight:700,background:"none",border:"none",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",padding:0,display:"flex",alignItems:"center",gap:5}}>{Icon.plus} Add meal</button>)}</div>
-          {rec&&(<div style={{display:"flex",gap:6,alignItems:"center",flexShrink:0,marginLeft:10}}><button onClick={()=>setRating(day,slot,"up")} style={{width:28,height:28,borderRadius:8,border:`1.5px solid ${rat==="up"?C.g2:C.brd}`,background:rat==="up"?C.g6:"transparent",color:rat==="up"?C.g2:C.mu,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>{Icon.thumbUp}</button><button onClick={()=>setRating(day,slot,"down")} style={{width:28,height:28,borderRadius:8,border:`1.5px solid ${rat==="down"?C.r2:C.brd}`,background:rat==="down"?C.r5:"transparent",color:rat==="down"?C.r2:C.mu,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>{Icon.thumbDn}</button></div>)}</div>
-          {rec&&(<div style={{display:"flex",gap:8,marginTop:8,alignItems:"center"}}><span style={{fontSize:11,color:C.mu}}>{rec.time} · {rec.cal}kcal · {rec.prot}g</span><div style={{flex:1}}/><span style={{fontSize:11,color:C.mu,fontWeight:600}}>Made it?</span><button onClick={()=>setConf(day,slot,true)} style={{padding:"3px 9px",borderRadius:12,border:`1.5px solid ${conf===true?C.g2:C.brd}`,background:conf===true?C.g2:"transparent",color:conf===true?C.wh:C.mu,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>Yes</button><button onClick={()=>setConf(day,slot,false)} style={{padding:"3px 9px",borderRadius:12,border:`1.5px solid ${conf===false?C.r2:C.brd}`,background:conf===false?C.r2:"transparent",color:conf===false?C.wh:C.mu,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>No</button></div>)}
-        </div>);})}
-      </div>))}
-    </div>);
+    const doSmartFill=()=>setLocal(p=>smartFillWeek(p));
+
+    // Compute rule violations
+    const weekRepeatCounts = validateWeekRepeat(plan);
+    const dinnerTypes = validateDinnerRotation(plan);
+
+    // Warnings summary
+    const repeatViolations = Object.entries(weekRepeatCounts).filter(([,c])=>c>2).length;
+    const dominantDinner = Object.entries(dinnerTypes).find(([,c])=>c>2);
+
+    if(adding)return(
+      <div style={{padding:"0 20px 32px"}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,padding:"16px 0"}}>
+          <button onClick={()=>setAdding(null)} style={{background:"none",border:"none",color:C.g2,cursor:"pointer",display:"flex"}}>{Icon.chevL}</button>
+          <h3 style={{fontFamily:"'Fraunces',serif",fontSize:18,color:C.dk,fontWeight:700}}>Pick from Meal Bank</h3>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          {mealbank.map(r=>{
+            const weekCount=weekRepeatCounts[r.id]||0;
+            const tooManyThisWeek=weekCount>=2;
+            return(
+              <div key={r.id} onClick={()=>!tooManyThisWeek&&assign(adding.day,adding.slot,r)} style={{padding:"13px 14px",borderRadius:12,background:tooManyThisWeek?C.bg2:C.wh,cursor:tooManyThisWeek?"not-allowed":"pointer",border:`1.5px solid ${tooManyThisWeek?C.brd:C.g4}`,display:"flex",justifyContent:"space-between",alignItems:"center",opacity:tooManyThisWeek?0.5:1}}>
+                <div>
+                  <p style={{fontSize:14,fontWeight:700,color:C.dk}}>{r.title}</p>
+                  <p style={{fontSize:11,color:C.mu,marginTop:2}}>{r.time} · {r.cal} kcal · {r.prot}g protein</p>
+                  {tooManyThisWeek&&<p style={{fontSize:11,color:C.r2,fontWeight:700,marginTop:2}}>Used {weekCount}× this week — max reached</p>}
+                </div>
+                {!tooManyThisWeek&&<div style={{color:C.lt}}>{Icon.chevR}</div>}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+
+    return(
+      <div style={{padding:"14px 20px 32px",display:"flex",flexDirection:"column",gap:14}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div>
+            <h3 style={{fontFamily:"'Fraunces',serif",fontSize:20,color:C.dk,fontWeight:700}}>Weekly Plan</h3>
+            <p style={{fontSize:12,color:C.mu,marginTop:2}}>Rate · confirm · track rules</p>
+          </div>
+          <button onClick={doSmartFill} style={{padding:"8px 14px",borderRadius:20,border:"none",background:C.g2,color:C.wh,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",gap:6}}>{Icon.refresh} Smart fill</button>
+        </div>
+
+        {/* Rules summary bar */}
+        <div style={{background:C.wh,borderRadius:12,padding:"12px 14px",border:`1.5px solid ${C.brd}`,display:"flex",flexDirection:"column",gap:8}}>
+          <p style={{fontSize:11,fontWeight:800,color:C.mu,textTransform:"uppercase",letterSpacing:"0.7px"}}>Weekly rules</p>
+          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+            {[
+              {label:"Dinner variety",ok:!dominantDinner,msg:dominantDinner?`Too much ${dominantDinner[0]} — aim to rotate chicken · beef · fish · veg`:"Chicken · beef · fish · veg rotation on track"},
+              {label:"No repeat meals",ok:repeatViolations===0,msg:repeatViolations>0?`${repeatViolations} recipe${repeatViolations>1?"s":""} used more than twice this week`:"No recipe used more than twice"},
+            ].map((r,i)=>(
+              <div key={i} style={{display:"flex",gap:8,alignItems:"flex-start"}}>
+                <div style={{width:16,height:16,borderRadius:"50%",background:r.ok?C.g2:C.r2,flexShrink:0,marginTop:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  <span style={{color:C.wh,fontSize:10,fontWeight:800}}>{r.ok?"✓":"!"}</span>
+                </div>
+                <p style={{fontSize:12,color:r.ok?C.g1:C.r1,fontWeight:r.ok?500:700,lineHeight:1.4}}>{r.msg}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {DAYS.map((day,dayIdx)=>{
+          // Compute daily macro totals for this day
+          const dayRecipes = mealSlotsForUser.map(s=>plan[day]?.[s]?.recipe).filter(Boolean);
+          const {calOk,protOk,totCal,totProt} = validateDay(dayRecipes);
+          const hasRecipes = dayRecipes.length>0;
+          const dayBorderCol = hasRecipes&&(!calOk||!protOk)?C.r3:hasRecipes&&calOk&&protOk?C.g4:C.brd;
+
+          return(
+            <div key={day} style={{background:C.wh,borderRadius:14,overflow:"hidden",border:`1.5px solid ${dayBorderCol}`}}>
+              <div style={{padding:"9px 14px",background:C.bg2,borderBottom:`1px solid ${C.brd}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <p style={{fontSize:11,fontWeight:800,color:C.md,textTransform:"uppercase",letterSpacing:"0.7px"}}>{day}</p>
+                {hasRecipes&&(
+                  <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                    <span style={{fontSize:10,fontWeight:700,color:calOk?C.g2:C.r2}}>{totCal} kcal {calOk?"✓":"⚠"}</span>
+                    <span style={{fontSize:10,fontWeight:700,color:protOk?C.g2:C.r2}}>{totProt}g prot {protOk?"✓":"⚠"}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Day-level macro warnings */}
+              {hasRecipes&&(!calOk||!protOk)&&(
+                <div style={{padding:"8px 14px",background:C.r5,borderBottom:`1px solid ${C.r4}`}}>
+                  {!calOk&&<p style={{fontSize:11,color:C.r1,fontWeight:700}}>{totCal<macros.calories-50?`⬇ ${macros.calories-totCal} kcal under target — add a snack`:`⬆ ${totCal-macros.calories} kcal over target — swap a meal`}</p>}
+                  {!protOk&&<p style={{fontSize:11,color:C.r1,fontWeight:700,marginTop:2}}>{totProt<macros.protein?`⬇ ${macros.protein-totProt}g protein short — add a high-protein meal`:`⬆ ${totProt-macros.protein-5}g over protein max — swap a meal`}</p>}
+                </div>
+              )}
+              {hasRecipes&&calOk&&protOk&&(
+                <div style={{padding:"6px 14px",background:C.g6,borderBottom:`1px solid ${C.g5}`}}>
+                  <p style={{fontSize:11,color:C.g1,fontWeight:700}}>Day on target — {totCal} kcal · {totProt}g protein</p>
+                </div>
+              )}
+
+              {mealSlotsForUser.map((slot,si)=>{
+                const entry=plan[day]?.[slot];const rec=entry?.recipe;const conf=entry?.confirmed;const rat=entry?.rating;
+                const repeatCount=rec?weekRepeatCounts[rec.id]||0:0;
+                const isOverRepeat=repeatCount>2;
+                const isDinnerSlot=slot.includes("dinner");
+                const dinnerType=rec&&isDinnerSlot?getDinnerProteinType(rec.title):null;
+                const dinnerTypeColor={chicken:C.o2,beef:C.r2,fish:C.g2,vegetables:C.g3}[dinnerType]||C.mu;
+
+                return(
+                  <div key={slot} style={{padding:"10px 14px",borderBottom:si<mealSlotsForUser.length-1?`1px solid ${C.bg3}`:"none",background:conf===true?C.g6:conf===false?C.r5:isOverRepeat?"#FFF8F0":"transparent"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                      <div style={{flex:1}}>
+                        <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:3}}>
+                          <span style={{color:C.mu,display:"flex",flexShrink:0}}>{mealIcon(slot)}</span>
+                          <p style={{fontSize:10,fontWeight:700,color:C.mu,textTransform:"uppercase",letterSpacing:"0.6px"}}>{mealLabel[slot]||slot}</p>
+                          {dinnerType&&<Tag label={dinnerType} color={dinnerTypeColor}/>}
+                          {isOverRepeat&&<Tag label="Repeat ×3" color={C.r2}/>}
+                        </div>
+                        {rec?(<p style={{fontSize:13,fontWeight:700,color:isOverRepeat?C.r1:C.dk,lineHeight:1.3}}>{rec.title}</p>):(<button onClick={()=>setAdding({day,slot})} style={{fontSize:12,color:C.g2,fontWeight:700,background:"none",border:"none",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",padding:0,display:"flex",alignItems:"center",gap:5}}>{Icon.plus} Add meal</button>)}
+                      </div>
+                      {rec&&(
+                        <div style={{display:"flex",gap:6,alignItems:"center",flexShrink:0,marginLeft:10}}>
+                          <button onClick={()=>setRating(day,slot,"up")} style={{width:28,height:28,borderRadius:8,border:`1.5px solid ${rat==="up"?C.g2:C.brd}`,background:rat==="up"?C.g6:"transparent",color:rat==="up"?C.g2:C.mu,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>{Icon.thumbUp}</button>
+                          <button onClick={()=>setRating(day,slot,"down")} style={{width:28,height:28,borderRadius:8,border:`1.5px solid ${rat==="down"?C.r2:C.brd}`,background:rat==="down"?C.r5:"transparent",color:rat==="down"?C.r2:C.mu,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>{Icon.thumbDn}</button>
+                        </div>
+                      )}
+                    </div>
+                    {rec&&(
+                      <div style={{display:"flex",gap:8,marginTop:8,alignItems:"center"}}>
+                        <span style={{fontSize:11,color:C.mu}}>{rec.time} · {rec.cal}kcal · {rec.prot}g</span>
+                        <div style={{flex:1}}/>
+                        <span style={{fontSize:11,color:C.mu,fontWeight:600}}>Made it?</span>
+                        <button onClick={()=>setConf(day,slot,true)} style={{padding:"3px 9px",borderRadius:12,border:`1.5px solid ${conf===true?C.g2:C.brd}`,background:conf===true?C.g2:"transparent",color:conf===true?C.wh:C.mu,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>Yes</button>
+                        <button onClick={()=>setConf(day,slot,false)} style={{padding:"3px 9px",borderRadius:12,border:`1.5px solid ${conf===false?C.r2:C.brd}`,background:conf===false?C.r2:"transparent",color:conf===false?C.wh:C.mu,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>No</button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    );
   }
 
   function DailyPlanTab(){
     const today=new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"});
     const slotMap={Breakfast:"breakfast",Lunch:"lunch",Snack:"snack",Dinner:"dinner","Second snack":"snack",Supper:"dinner"};
     const dailyPlan=mealtimes.map((m,i)=>{const type=slotMap[m]||"lunch";const rec=mealbank.find(r=>r.mealType===type)||mealbank[i%mealbank.length];return{meal:m,recipe:rec};});
-    const totCal=dailyPlan.reduce((s,d)=>s+(d.recipe?.cal||0),0);const totProt=dailyPlan.reduce((s,d)=>s+(d.recipe?.prot||0),0);
-    return(<div style={{padding:"14px 20px 32px",display:"flex",flexDirection:"column",gap:14}}>
-      <div><h3 style={{fontFamily:"'Fraunces',serif",fontSize:20,color:C.dk,fontWeight:700}}>Today</h3><p style={{fontSize:12,color:C.mu,marginTop:2}}>{today}</p></div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-        <div style={{padding:"14px",borderRadius:12,background:C.o5,border:`1.5px solid ${C.o4}`,textAlign:"center"}}><p style={{fontFamily:"'Fraunces',serif",fontSize:28,color:C.o2,fontWeight:700}}>{totCal}</p><p style={{fontSize:10,color:C.mu,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px",marginTop:2}}>kcal / {macros.calories}</p></div>
-        <div style={{padding:"14px",borderRadius:12,background:C.g6,border:`1.5px solid ${C.g5}`,textAlign:"center"}}><p style={{fontFamily:"'Fraunces',serif",fontSize:28,color:C.g2,fontWeight:700}}>{totProt}g</p><p style={{fontSize:10,color:C.mu,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px",marginTop:2}}>protein / {macros.protein}g</p></div>
+    const totCal=dailyPlan.reduce((s,d)=>s+(d.recipe?.cal||0),0);
+    const totProt=dailyPlan.reduce((s,d)=>s+(d.recipe?.prot||0),0);
+    const calOk=totCal===0||(totCal>=macros.calories-50&&totCal<=macros.calories+50);
+    const protOk=totProt===0||(totProt>=macros.protein&&totProt<=macros.protein+5);
+    const calPct=Math.min(100,(totCal/macros.calories)*100);
+    const protPct=Math.min(100,(totProt/macros.protein)*100);
+
+    return(
+      <div style={{padding:"14px 20px 32px",display:"flex",flexDirection:"column",gap:14}}>
+        <div><h3 style={{fontFamily:"'Fraunces',serif",fontSize:20,color:C.dk,fontWeight:700}}>Today</h3><p style={{fontSize:12,color:C.mu,marginTop:2}}>{today}</p></div>
+
+        {/* Macro targets with pass/fail */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+          {[
+            {l:"Calories",val:totCal,target:macros.calories,unit:"kcal",ok:calOk,pct:calPct,ac:C.o2,bg:C.o5,bd:C.o4,hint:`Target: ${macros.calories-50}–${macros.calories+50}`},
+            {l:"Protein",val:totProt,target:macros.protein,unit:"g",ok:protOk,pct:protPct,ac:C.g2,bg:C.g6,bd:C.g5,hint:`Target: ${macros.protein}–${macros.protein+5}g`},
+          ].map(m=>(
+            <div key={m.l} style={{padding:"14px",borderRadius:12,background:totCal===0?m.bg:m.ok?m.bg:C.r5,border:`1.5px solid ${totCal===0?m.bd:m.ok?m.bd:C.r4}`,textAlign:"center"}}>
+              <p style={{fontFamily:"'Fraunces',serif",fontSize:26,color:totCal===0?m.ac:m.ok?m.ac:C.r2,fontWeight:700}}>{m.val}{m.unit==="g"?"g":""}</p>
+              <p style={{fontSize:10,color:C.mu,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px",marginTop:2}}>{m.l}</p>
+              <div style={{height:5,borderRadius:3,background:"rgba(0,0,0,0.08)",marginTop:8,overflow:"hidden"}}><div style={{height:"100%",borderRadius:3,background:m.ok?m.ac:C.r2,width:`${m.pct}%`,transition:"width 0.4s"}}/></div>
+              <p style={{fontSize:10,color:C.mu,marginTop:5}}>{m.hint}</p>
+              {totCal>0&&!m.ok&&<p style={{fontSize:10,color:C.r2,fontWeight:700,marginTop:3}}>{m.l==="Calories"?(totCal<macros.calories-50?`${macros.calories-50-totCal} short`:`${totCal-macros.calories-50} over`):(totProt<macros.protein?`${macros.protein-totProt}g short`:`${totProt-macros.protein-5}g over`)}</p>}
+              {totCal>0&&m.ok&&<p style={{fontSize:10,color:m.ac,fontWeight:700,marginTop:3}}>On target</p>}
+            </div>
+          ))}
+        </div>
+
+        {/* Macro rules reminder */}
+        <div style={{padding:"11px 14px",borderRadius:10,background:C.wh,border:`1.5px solid ${C.brd}`}}>
+          <p style={{fontSize:11,fontWeight:800,color:C.mu,textTransform:"uppercase",letterSpacing:"0.7px",marginBottom:6}}>Daily rules</p>
+          <p style={{fontSize:12,color:C.md,lineHeight:1.6}}>Calories must land within <strong>±50 kcal</strong> of your {macros.calories} target. Protein must be between <strong>{macros.protein}g and {macros.protein+5}g</strong>.</p>
+        </div>
+
+        {dailyPlan.map((item,i)=>(
+          <div key={i} style={{background:C.wh,borderRadius:13,overflow:"hidden",border:`1.5px solid ${C.brd}`}}>
+            <div style={{padding:"7px 14px",background:C.bg2,borderBottom:`1px solid ${C.brd}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <div style={{display:"flex",gap:6,alignItems:"center"}}>
+                <span style={{color:C.mu,display:"flex"}}>{MealIcon[{Breakfast:"breakfast",Lunch:"lunch",Snack:"snack",Dinner:"dinner","Second snack":"second_snack",Supper:"supper"}[item.meal]]||MealIcon.lunch}</span>
+                <p style={{fontSize:10,fontWeight:800,color:C.mu,textTransform:"uppercase",letterSpacing:"0.7px"}}>{item.meal}</p>
+              </div>
+              {item.recipe&&item.recipe.mealType==="dinner"&&(
+                <Tag label={getDinnerProteinType(item.recipe.title)} color={{chicken:C.o2,beef:C.r2,fish:C.g2,vegetables:C.g3}[getDinnerProteinType(item.recipe.title)]||C.mu}/>
+              )}
+            </div>
+            <div style={{padding:"12px 14px"}}>
+              {item.recipe?(
+                <>
+                  <h4 style={{fontSize:14,fontWeight:700,color:C.dk,marginBottom:4}}>{item.recipe.title}</h4>
+                  <div style={{display:"flex",gap:12}}>
+                    <span style={{fontSize:11,color:C.mu}}>{item.recipe.time}</span>
+                    <span style={{fontSize:11,color:C.mu}}>{item.recipe.cal} kcal</span>
+                    <span style={{fontSize:11,color:C.mu}}>{item.recipe.prot}g protein</span>
+                  </div>
+                </>
+              ):(
+                <p style={{fontSize:13,color:C.mu}}>Nothing planned</p>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
-      {dailyPlan.map((item,i)=>(<div key={i} style={{background:C.wh,borderRadius:13,overflow:"hidden",border:`1.5px solid ${C.brd}`}}><div style={{padding:"7px 14px",background:C.bg2,borderBottom:`1px solid ${C.brd}`}}><p style={{fontSize:10,fontWeight:800,color:C.mu,textTransform:"uppercase",letterSpacing:"0.7px"}}>{item.meal}</p></div><div style={{padding:"12px 14px"}}>{item.recipe?(<><h4 style={{fontSize:14,fontWeight:700,color:C.dk,marginBottom:4}}>{item.recipe.title}</h4><div style={{display:"flex",gap:12}}><span style={{fontSize:11,color:C.mu}}>{item.recipe.time}</span><span style={{fontSize:11,color:C.mu}}>{item.recipe.cal} kcal</span><span style={{fontSize:11,color:C.mu}}>{item.recipe.prot}g protein</span></div></>):(<p style={{fontSize:13,color:C.mu}}>Nothing planned</p>)}</div></div>))}
-    </div>);
+    );
   }
 
   function MealBankTab(){
-    const[showAdd,setShowAdd]=useState(false);const[url,setUrl]=useState("");const[parsing,setParsing]=useState(false);const[filter,setFilter]=useState("all");const[editIdx,setEditIdx]=useState(null);const[aiLoading,setAiLoading]=useState(false);const[parseErr,setParseErr]=useState("");
+    const[showAdd,setShowAdd]=useState(false);const[url,setUrl]=useState("");const[parsing,setParsing]=useState(false);const[filter,setFilter]=useState("all");const[editIdx,setEditIdx]=useState(null);const[viewRecipe,setViewRecipe]=useState(null);const[aiLoading,setAiLoading]=useState(false);const[parseErr,setParseErr]=useState("");
     const parseUrl=async()=>{if(!url.trim())return;setParsing(true);setParseErr("");try{const rec=await parseRecipeUrl(url);updateMealBank(p=>[...p,rec]);setUrl("");setShowAdd(false);}catch(e){setParseErr("Couldn't extract that recipe. Try a direct recipe page URL.");}finally{setParsing(false);};};
     const genAi=async()=>{setAiLoading(true);try{const recs=await generateRecipes();updateMealBank(p=>[...p,...recs.map((r,i)=>({...r,id:Date.now()+i,source:"ai"}))]);setTab("mealbank");}catch{}finally{setAiLoading(false);};};
-    const del=(id)=>updateMealBank(p=>p.filter(r=>r.id!==id));
+    const del=(id)=>{if(viewRecipe?.id===id)setViewRecipe(null);updateMealBank(p=>p.filter(r=>r.id!==id));};
     const filtered=filter==="all"?mealbank:mealbank.filter(r=>r.source===filter);
     const srcCol={tiktok:C.r2,instagram:C.o2,youtube:C.r2,web:C.g2,manual:C.g2,ai:C.g3};
     const srcIcon={tiktok:Icon.video,instagram:Icon.link,youtube:Icon.video,web:Icon.link,manual:Icon.chef,ai:Icon.refresh};
+
+    // ── RECIPE DETAIL VIEW ──
+    if(viewRecipe){
+      const r=viewRecipe;const sc=srcCol[r.source]||C.g2;
+      return(
+        <div style={{paddingBottom:32}}>
+          <div style={{background:C.g2,padding:"20px 20px 24px"}}>
+            <button onClick={()=>setViewRecipe(null)} style={{background:"rgba(255,255,255,0.15)",border:"none",color:C.wh,padding:"7px 14px",borderRadius:20,fontSize:13,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:700,marginBottom:16,display:"flex",alignItems:"center",gap:6}}>{Icon.chevL} Back</button>
+            <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:10}}><Tag label={r.source==="ai"?"AI Generated":r.source||"manual"} color="rgba(255,255,255,0.3)"/></div>
+            <h2 style={{fontFamily:"'Fraunces',serif",fontSize:24,color:C.wh,fontWeight:700,lineHeight:1.2,marginBottom:12}}>{r.title}</h2>
+            <p style={{fontSize:13,color:"rgba(255,255,255,0.7)",lineHeight:1.6,marginBottom:14}}>{r.desc}</p>
+            <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>
+              {[{i:Icon.clock,v:r.time},{i:Icon.fire,v:`${r.cal} kcal`},{i:Icon.chef,v:`${r.prot}g protein`},{i:null,v:r.tag}].map((x,i)=>x.v&&(
+                <span key={i} style={{fontSize:12,color:"rgba(255,255,255,0.75)",fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
+                  {x.i&&<span style={{opacity:0.8}}>{x.i}</span>}{x.v}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div style={{padding:"20px 20px 0",display:"flex",flexDirection:"column",gap:24}}>
+            {r.prepTip&&(
+              <div style={{padding:"12px 14px",borderRadius:12,background:C.g6,border:`1px solid ${C.g5}`,display:"flex",gap:10,alignItems:"flex-start"}}>
+                <span style={{color:C.g3,flexShrink:0,marginTop:1}}>{Icon.clock}</span>
+                <p style={{fontSize:13,color:C.g1,fontWeight:600,lineHeight:1.5}}>{r.prepTip}</p>
+              </div>
+            )}
+            {(r.ingredients||[]).length>0&&(
+              <div>
+                <p style={{fontSize:11,fontWeight:800,color:C.mu,textTransform:"uppercase",letterSpacing:"0.8px",marginBottom:14}}>Ingredients</p>
+                <div style={{display:"flex",flexDirection:"column",gap:0}}>
+                  {r.ingredients.map((ing,i)=>(
+                    <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:`1px solid ${C.bg3}`}}>
+                      <div style={{width:7,height:7,borderRadius:"50%",background:C.g4,flexShrink:0}}/>
+                      <span style={{fontSize:14,color:C.md,fontWeight:500}}>{ing}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {(r.steps||[]).length>0&&(
+              <div>
+                <p style={{fontSize:11,fontWeight:800,color:C.mu,textTransform:"uppercase",letterSpacing:"0.8px",marginBottom:16}}>Method</p>
+                <div style={{display:"flex",flexDirection:"column",gap:14}}>
+                  {r.steps.map((step,i)=>(
+                    <div key={i} style={{display:"flex",gap:14,alignItems:"flex-start"}}>
+                      <div style={{width:28,height:28,borderRadius:"50%",background:C.g2,color:C.wh,fontSize:12,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{i+1}</div>
+                      <p style={{fontSize:14,color:C.md,lineHeight:1.7,fontWeight:400,paddingTop:4}}>{step}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div style={{display:"flex",gap:10,paddingTop:8}}>
+              <button onClick={()=>{setEditIdx(mealbank.findIndex(x=>x.id===r.id));setViewRecipe(null);}} style={{flex:1,padding:"13px",borderRadius:12,border:`1.5px solid ${C.brd}`,background:C.wh,color:C.md,fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:7}}>{Icon.edit} Edit</button>
+              <button onClick={()=>del(r.id)} style={{padding:"13px 18px",borderRadius:12,border:`1.5px solid ${C.r4}`,background:C.r5,color:C.r2,fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",gap:7}}>{Icon.trash}</button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── EDIT VIEW ──
     if(editIdx!==null){const r=mealbank[editIdx];return(<div style={{padding:"0 20px 32px"}}><div style={{display:"flex",alignItems:"center",gap:12,padding:"16px 0"}}><button onClick={()=>setEditIdx(null)} style={{background:"none",border:"none",color:C.g2,cursor:"pointer",display:"flex"}}>{Icon.chevL}</button><h3 style={{fontFamily:"'Fraunces',serif",fontSize:18,color:C.dk,fontWeight:700}}>Edit recipe</h3></div><div style={{display:"flex",flexDirection:"column",gap:14}}>{[["title","Recipe name"],["time","Cook time"],["desc","Description"]].map(([k,l])=>(<div key={k}><label style={lbl}>{l}</label><input value={r[k]||""} onChange={e=>updateMealBank(p=>p.map((x,i)=>i===editIdx?{...x,[k]:e.target.value}:x))} style={inp}/></div>))}<div><label style={lbl}>Ingredients (one per line)</label><textarea value={(r.ingredients||[]).join("\n")} onChange={e=>updateMealBank(p=>p.map((x,i)=>i===editIdx?{...x,ingredients:e.target.value.split("\n")}:x))} style={{...inp,height:100,resize:"none",fontFamily:"'DM Sans',sans-serif"}}/></div><div><label style={lbl}>Steps (one per line)</label><textarea value={(r.steps||[]).join("\n")} onChange={e=>updateMealBank(p=>p.map((x,i)=>i===editIdx?{...x,steps:e.target.value.split("\n")}:x))} style={{...inp,height:100,resize:"none",fontFamily:"'DM Sans',sans-serif"}}/></div><Btn onClick={()=>setEditIdx(null)} label="Save changes"/></div></div>);}
+
+    // ── LIST VIEW ──
     return(<div style={{padding:"14px 20px 32px",display:"flex",flexDirection:"column",gap:14}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><h3 style={{fontFamily:"'Fraunces',serif",fontSize:20,color:C.dk,fontWeight:700}}>Meal Bank</h3><p style={{fontSize:12,color:C.mu,marginTop:2}}>{mealbank.length} recipes saved</p></div><div style={{display:"flex",gap:8}}><button onClick={genAi} disabled={aiLoading} style={{padding:"8px 12px",borderRadius:20,border:"none",background:C.g6,color:C.g2,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",gap:5}}><span style={{display:"flex"}}>{Icon.refresh}</span>{aiLoading?"...":"AI recipes"}</button><button onClick={()=>setShowAdd(!showAdd)} style={{padding:"8px 14px",borderRadius:20,border:"none",background:C.g2,color:C.wh,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",gap:5}}>{Icon.plus} Save</button></div></div>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><h3 style={{fontFamily:"'Fraunces',serif",fontSize:20,color:C.dk,fontWeight:700}}>Meal Bank</h3><p style={{fontSize:12,color:C.mu,marginTop:2}}>{mealbank.length} recipes saved</p></div><div style={{display:"flex",gap:8}}><button onClick={genAi} disabled={aiLoading} style={{padding:"8px 12px",borderRadius:20,border:"none",background:C.g6,color:C.g2,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",gap:5}}><span style={{display:"flex"}}>{Icon.refresh}</span>{aiLoading?"Generating...":"AI recipes"}</button><button onClick={()=>setShowAdd(!showAdd)} style={{padding:"8px 14px",borderRadius:20,border:"none",background:C.g2,color:C.wh,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",display:"flex",alignItems:"center",gap:5}}>{Icon.plus} Save</button></div></div>
       {showAdd&&(<div style={{padding:"14px",borderRadius:12,background:C.wh,border:`1.5px solid ${C.brd}`,display:"flex",flexDirection:"column",gap:10}}><p style={{fontSize:11,fontWeight:700,color:C.mu,textTransform:"uppercase",letterSpacing:"0.6px"}}>Paste a link from Instagram, TikTok, YouTube, or any recipe site</p><input value={url} onChange={e=>setUrl(e.target.value)} placeholder="https://..." style={inp}/>{parseErr&&<p style={{fontSize:12,color:C.r2,fontWeight:600}}>{parseErr}</p>}{parsing?(<p style={{fontSize:13,color:C.g2,fontWeight:700}}>Extracting recipe...</p>):(<div style={{display:"flex",gap:8}}><Btn onClick={parseUrl} label="Extract recipe" small/><Btn onClick={()=>{setShowAdd(false);setUrl("");setParseErr("");}} label="Cancel" small secondary/></div>)}</div>)}
       <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4}}>{["all","manual","ai","instagram","tiktok","youtube"].map(f=>(<button key={f} onClick={()=>setFilter(f)} style={{padding:"6px 14px",borderRadius:20,border:`1.5px solid ${filter===f?C.g2:C.brd}`,background:filter===f?C.g6:C.wh,color:filter===f?C.g2:C.mu,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap",textTransform:"capitalize"}}>{f==="all"?"All":f==="ai"?"AI Generated":f}</button>))}</div>
-      {filtered.map((r,idx)=>{const realIdx=mealbank.findIndex(x=>x.id===r.id);const sc=srcCol[r.source]||C.g2;return(<div key={r.id} style={{background:C.wh,borderRadius:13,border:`1.5px solid ${C.brd}`,overflow:"hidden"}}><div style={{padding:"13px 14px"}}><div style={{display:"flex",gap:8,alignItems:"center",marginBottom:6}}><span style={{color:sc}}>{srcIcon[r.source]||Icon.chef}</span><Tag label={r.source==="ai"?"AI Generated":r.source||"manual"} color={sc}/></div><h4 style={{fontSize:14,fontWeight:700,color:C.dk,lineHeight:1.3,marginBottom:3}}>{r.title}</h4><p style={{fontSize:11,color:C.mu,lineHeight:1.4,marginBottom:8}}>{r.desc}</p><div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><div style={{display:"flex",gap:10}}><span style={{fontSize:11,color:C.mu}}>{r.time}</span><span style={{fontSize:11,color:C.mu}}>{r.cal} kcal</span><span style={{fontSize:11,color:C.mu}}>{r.prot}g</span></div><div style={{display:"flex",gap:6}}><button onClick={()=>setEditIdx(realIdx)} style={{width:28,height:28,borderRadius:8,border:`1.5px solid ${C.brd}`,background:"transparent",color:C.mu,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>{Icon.edit}</button><button onClick={()=>del(r.id)} style={{width:28,height:28,borderRadius:8,border:`1.5px solid ${C.brd}`,background:"transparent",color:C.r2,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>{Icon.trash}</button></div></div></div></div>);})}</div>);
+      {filtered.map((r)=>{const sc=srcCol[r.source]||C.g2;return(
+        <div key={r.id} onClick={()=>setViewRecipe(r)} style={{background:C.wh,borderRadius:13,border:`1.5px solid ${C.brd}`,overflow:"hidden",cursor:"pointer",transition:"transform 0.1s"}}>
+          <div style={{padding:"13px 14px"}}>
+            <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:6}}><span style={{color:sc}}>{srcIcon[r.source]||Icon.chef}</span><Tag label={r.source==="ai"?"AI Generated":r.source||"manual"} color={sc}/></div>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+              <div style={{flex:1}}>
+                <h4 style={{fontSize:14,fontWeight:700,color:C.dk,lineHeight:1.3,marginBottom:3}}>{r.title}</h4>
+                <p style={{fontSize:11,color:C.mu,lineHeight:1.4,marginBottom:8}}>{r.desc}</p>
+                <div style={{display:"flex",gap:10}}>
+                  <span style={{fontSize:11,color:C.mu,display:"flex",alignItems:"center",gap:4}}><span style={{color:C.g3}}>{Icon.clock}</span>{r.time}</span>
+                  <span style={{fontSize:11,color:C.mu}}>{r.cal} kcal</span>
+                  <span style={{fontSize:11,color:C.mu}}>{r.prot}g protein</span>
+                </div>
+              </div>
+              <div style={{color:C.lt,marginLeft:10,marginTop:2,flexShrink:0}}>{Icon.chevR}</div>
+            </div>
+          </div>
+        </div>
+      );})}
+    </div>);
   }
 
   function KitchenTab(){
@@ -256,8 +626,22 @@ function MainApp({profile,macros,inv,mealbank,setMealbank,weeklyPlan,setWeeklyPl
   }
 
   function ShopTab(){
-    const[checked,setChecked]=useState([]);const tog=n=>setChecked(p=>p.includes(n)?p.filter(x=>x!==n):[...p,n]);const est=GROCERY_ITEMS.filter(i=>checked.includes(i.name)).reduce((s,i)=>s+parseFloat(i.est.replace("$","")),0);
-    return(<div style={{padding:"14px 20px 32px",display:"flex",flexDirection:"column",gap:14}}><div><h3 style={{fontFamily:"'Fraunces',serif",fontSize:20,color:C.dk,fontWeight:700}}>Grocery List</h3><p style={{fontSize:12,color:C.mu,marginTop:2}}>Based on inventory gaps and shopping history</p></div><div style={{padding:"12px 14px",borderRadius:10,background:C.g6,border:`1px solid ${C.g5}`}}><p style={{fontSize:13,color:C.g1,fontWeight:700}}>{checked.length} of {GROCERY_ITEMS.length} selected · Est. ${est.toFixed(0)} CAD</p></div>{GROCERY_ITEMS.map((item,i)=>(<div key={i} onClick={()=>tog(item.name)} style={{display:"flex",gap:12,padding:"13px 14px",borderRadius:12,background:C.wh,cursor:"pointer",border:`1.5px solid ${checked.includes(item.name)?C.g3:C.brd}`,opacity:checked.includes(item.name)?0.65:1,transition:"all 0.15s"}}><div style={{width:20,height:20,borderRadius:6,flexShrink:0,marginTop:2,border:`1.5px solid ${checked.includes(item.name)?C.g2:C.brd}`,background:checked.includes(item.name)?C.g2:"transparent",display:"flex",alignItems:"center",justifyContent:"center",color:C.wh}}>{checked.includes(item.name)&&Icon.check}</div><div style={{flex:1}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><p style={{fontSize:14,fontWeight:700,color:C.dk,textDecoration:checked.includes(item.name)?"line-through":"none"}}>{item.name}</p><div style={{display:"flex",gap:8,alignItems:"center"}}><Tag label={item.tag} color={item.tag==="Restock"?C.o2:C.g2}/><span style={{fontSize:12,color:C.mu,fontWeight:700}}>{item.est}</span></div></div><p style={{fontSize:11,color:C.mu,lineHeight:1.5}}>{item.reason}</p></div></div>))}</div>);
+    const[checked,setChecked]=useState([]);const tog=n=>setChecked(p=>p.includes(n)?p.filter(x=>x!==n):[...p,n]);
+    return(<div style={{padding:"14px 20px 32px",display:"flex",flexDirection:"column",gap:14}}>
+      <div><h3 style={{fontFamily:"'Fraunces',serif",fontSize:20,color:C.dk,fontWeight:700}}>Shopping List</h3><p style={{fontSize:12,color:C.mu,marginTop:2}}>Based on your inventory gaps and shopping history</p></div>
+      <div style={{padding:"12px 14px",borderRadius:10,background:C.g6,border:`1px solid ${C.g5}`}}><p style={{fontSize:13,color:C.g1,fontWeight:700}}>{checked.length} of {GROCERY_ITEMS.length} items checked off</p></div>
+      {GROCERY_ITEMS.map((item,i)=>(<div key={i} onClick={()=>tog(item.name)} style={{display:"flex",gap:12,padding:"13px 14px",borderRadius:12,background:C.wh,cursor:"pointer",border:`1.5px solid ${checked.includes(item.name)?C.g3:C.brd}`,opacity:checked.includes(item.name)?0.65:1,transition:"all 0.15s"}}>
+        <div style={{width:20,height:20,borderRadius:6,flexShrink:0,marginTop:2,border:`1.5px solid ${checked.includes(item.name)?C.g2:C.brd}`,background:checked.includes(item.name)?C.g2:"transparent",display:"flex",alignItems:"center",justifyContent:"center",color:C.wh}}>{checked.includes(item.name)&&Icon.check}</div>
+        <div style={{flex:1}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+            <p style={{fontSize:14,fontWeight:700,color:C.dk,textDecoration:checked.includes(item.name)?"line-through":"none"}}>{item.name}</p>
+            <Tag label={item.tag} color={item.tag==="Restock"?C.o2:C.g2}/>
+          </div>
+          <p style={{fontSize:11,color:C.mu,lineHeight:1.5}}>{item.reason}</p>
+          <p style={{fontSize:11,color:C.mu,marginTop:3,fontWeight:600}}>Qty: {item.qty}</p>
+        </div>
+      </div>))}
+    </div>);
   }
 
   function ProfileTab(){return(<div style={{padding:"14px 20px 32px",display:"flex",flexDirection:"column",gap:14}}><div style={{background:C.g2,borderRadius:16,padding:"24px",textAlign:"center"}}><div style={{width:56,height:56,borderRadius:"50%",background:"rgba(255,255,255,0.15)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px",color:C.wh}}>{Icon.user}</div><h2 style={{fontFamily:"'Fraunces',serif",fontSize:22,color:C.wh,fontWeight:700}}>{profile.name||"Your profile"}</h2><p style={{fontSize:13,color:"rgba(255,255,255,0.55)",marginTop:4}}>{profile.sex} · age {profile.age}</p></div><div style={{background:C.wh,borderRadius:14,padding:"16px",border:`1.5px solid ${C.brd}`}}><p style={{fontSize:11,fontWeight:700,color:C.mu,textTransform:"uppercase",letterSpacing:"0.7px",marginBottom:14}}>Daily targets</p>{[{l:"Calories",v:macros.calories,u:"kcal"},{l:"Protein",v:macros.protein,u:"g"}].map(m=>(<div key={m.l} style={{display:"flex",justifyContent:"space-between",paddingBottom:10,borderBottom:`1px solid ${C.bg3}`,marginBottom:10}}><span style={{fontSize:13,color:C.md,fontWeight:600}}>{m.l}</span><span style={{fontSize:13,color:C.dk,fontWeight:700}}>{m.v} {m.u}</span></div>))}</div>{profile.goals?.length>0&&(<div style={{background:C.wh,borderRadius:14,padding:"16px",border:`1.5px solid ${C.brd}`}}><p style={{fontSize:11,fontWeight:700,color:C.mu,textTransform:"uppercase",letterSpacing:"0.7px",marginBottom:12}}>Goals</p><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{profile.goals.map(g=>{const gObj=GOALS.find(x=>x.k===g);return gObj?<Tag key={g} label={gObj.l}/>:null;})}</div></div>)}<button onClick={onSignOut} style={{width:"100%",padding:"13px",borderRadius:12,border:`1.5px solid ${C.brd}`,background:C.wh,color:C.r2,fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>Sign out</button></div>);}
@@ -278,7 +662,10 @@ function MainApp({profile,macros,inv,mealbank,setMealbank,weeklyPlan,setWeeklyPl
 export default function App(){
   useEffect(()=>{
     const link=document.createElement("link");link.href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;700;900&family=DM+Sans:wght@400;500;600;700&display=swap";link.rel="stylesheet";document.head.appendChild(link);
-    const s=document.createElement("style");s.textContent=`*{box-sizing:border-box;margin:0;padding:0;}body{background:#F5F0E8;}input,textarea{outline:none;}input:focus,textarea:focus{border-color:#3A7D56!important;}textarea{font-family:'DM Sans',sans-serif;}`;document.head.appendChild(s);
+    const s=document.createElement("style");
+    // 100dvh on mobile accounts for browser chrome — prevents button cutoff
+    s.textContent=`*{box-sizing:border-box;margin:0;padding:0;}body{background:#F5F0E8;}input,textarea{outline:none;}input:focus,textarea:focus{border-color:#3A7D56!important;}textarea{font-family:'DM Sans',sans-serif;}`;
+    document.head.appendChild(s);
     return()=>{try{document.head.removeChild(link);document.head.removeChild(s);}catch{}};
   },[]);
 
@@ -297,14 +684,47 @@ export default function App(){
   const[loadingAuth,setLoadingAuth]=useState(true);
 
   useEffect(()=>{
+    // ── Step 1: Check localStorage first (works even without Supabase) ──
+    // This is what prevents re-onboarding. If the user has completed setup on
+    // this device before, we load their data and skip straight to the app.
+    const localOnboarded = localStorage.getItem('savorly_onboarded');
+    const localProfile = localStorage.getItem('savorly_profile');
+
+    if(localOnboarded==='true' && localProfile){
+      try{
+        const prof = JSON.parse(localProfile);
+        setProfile(prof);
+        if(prof.macros) setMacros(prof.macros);
+        const localInv=localStorage.getItem('savorly_inventory');
+        const localMB=localStorage.getItem('savorly_mealbank');
+        const localWP=localStorage.getItem('savorly_weeklyplan');
+        if(localInv) setInventory(JSON.parse(localInv));
+        if(localMB) setMealbank(JSON.parse(localMB));
+        if(localWP) setWeeklyPlan(JSON.parse(localWP));
+        setStep(99);
+        setLoadingAuth(false);
+        return; // skip Supabase check — data is already loaded
+      }catch(e){
+        // Corrupt localStorage — clear and re-onboard
+        localStorage.clear();
+      }
+    }
+
+    // ── Step 2: Check Supabase for returning user on a new device ──
     getUser().then(user=>{
       if(user){
-        // Load saved data for returning user
         Promise.all([loadProfile(),loadInventory(),loadMealBank(),loadWeeklyPlan()]).then(([prof,inv,mb,wp])=>{
-          if(prof){setProfile(prof);setStep(99);} // 99 = go straight to app
-          if(inv)setInventory(inv);
-          if(mb)setMealbank(mb);
-          if(wp)setWeeklyPlan(wp);
+          if(prof){
+            setProfile(prof);
+            if(prof.macros)setMacros(prof.macros);
+            // Cache to localStorage so future loads are instant
+            localStorage.setItem('savorly_onboarded','true');
+            localStorage.setItem('savorly_profile',JSON.stringify(prof));
+            setStep(99);
+          }
+          if(inv){setInventory(inv);localStorage.setItem('savorly_inventory',JSON.stringify(inv));}
+          if(mb){setMealbank(mb);localStorage.setItem('savorly_mealbank',JSON.stringify(mb));}
+          if(wp){setWeeklyPlan(wp);localStorage.setItem('savorly_weeklyplan',JSON.stringify(wp));}
           setAuthed(true);
         });
       }
@@ -315,19 +735,34 @@ export default function App(){
   const next=()=>setStep(s=>s+1);
 
   const finishOnboarding=async()=>{
-    const finalProfile={...profile,goals:profile.goals,mealtimes:profile.mealtimes,cookDays:profile.cookDays,cuisines,allergens,dislikes,health};
+    const finalProfile={...profile,goals:profile.goals,mealtimes:profile.mealtimes,cookDays:profile.cookDays,cuisines,allergens,dislikes,health,macros};
     setProfile(finalProfile);
+    // Save to localStorage — this is what makes the app remember you
+    localStorage.setItem('savorly_onboarded','true');
+    localStorage.setItem('savorly_profile',JSON.stringify(finalProfile));
+    localStorage.setItem('savorly_inventory',JSON.stringify(inventory));
+    localStorage.setItem('savorly_mealbank',JSON.stringify(mealbank));
+    // Save to Supabase if available (syncs across devices)
     await saveProfile(finalProfile);
     await saveInventory(inventory);
     await saveMealBank(mealbank);
     setStep(99);
   };
 
-  const handleSignOut=async()=>{await signOut();setStep(0);setAuthed(false);};
+  const handleSignOut=async()=>{
+    // Clear localStorage so next user on this device starts fresh
+    localStorage.removeItem('savorly_onboarded');
+    localStorage.removeItem('savorly_profile');
+    localStorage.removeItem('savorly_inventory');
+    localStorage.removeItem('savorly_mealbank');
+    localStorage.removeItem('savorly_weeklyplan');
+    await signOut();
+    setStep(0);
+    setAuthed(false);
+  };
 
-  if(loadingAuth)return(<div style={{minHeight:"100vh",background:C.g2,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'DM Sans',sans-serif"}}><p style={{color:"rgba(255,255,255,0.6)",fontSize:14}}>Loading...</p></div>);
+  if(loadingAuth)return(<div style={{height:"100dvh",background:C.g2,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'DM Sans',sans-serif"}}><p style={{color:"rgba(255,255,255,0.6)",fontSize:14}}>Loading...</p></div>);
 
-  // Skip auth for now if supabase not configured — goes straight to onboarding
   if(!authed&&step===0)return(<Welcome go={next}/>);
   if(!authed&&step===1)return <OB_Name p={profile} sp={setProfile} go={next}/>;
   if(!authed&&step===2)return <OB_Body p={profile} sp={setProfile} go={next}/>;
